@@ -1,8 +1,8 @@
 import User from "../models/user.model.js";
-import sequelize from "../db/connect.db.js";
 import bcryptjs from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
+import Branch from "../models/branch.model.js";
 
 export const signupUserController = async (req, res) => {
   try {
@@ -27,12 +27,11 @@ export const signupUserController = async (req, res) => {
     if (password !== confirmPassword)
       return res.status(400).json({ error: "Passwords do not match" });
 
-    if (!(await checkIfTableExists(`categories_${branchId}`))) {
+    if (!(await Branch.findOne({ where: { branchId } }))) {
       return res.status(400).json({
         error: "This branch does not exist",
       });
     }
-
     await User.create({
       username,
       name,
@@ -90,23 +89,6 @@ export const logoutUserController = async (req, res) => {
   } catch (err) {
     console.log("Logout controller error", err);
     res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-const checkIfTableExists = async (tableName) => {
-  try {
-    const queryInterface = sequelize.getQueryInterface();
-    const tables = await queryInterface.showAllSchemas();
-
-    const tableExists = tables.some((schema) => {
-      return schema.Tables_in_goods_management === tableName;
-    });
-    // console.log(tables);
-    console.log(`Table ${tableName} exists:`, tableExists);
-    return tableExists;
-  } catch (error) {
-    console.error(`Error checking table existence for ${tableName}:`, error);
-    return false;
   }
 };
 

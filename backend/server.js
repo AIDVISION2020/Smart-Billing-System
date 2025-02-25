@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import syncDB from "./config/dbsync.config.js";
 import goodsRoutes from "./routes/goods.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import branchRoutes from "./routes/branch.routes.js";
 
 const __dirname = path.resolve(); // Get the current directory
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use(cookieParser()); // To parse cookie values
 
 app.use("/api/goods", goodsRoutes); // Use the goods routes
 app.use("/api/auth", authRoutes); // Use the auth routes
+app.use("/api/branch", branchRoutes); // Use the branch routes
 
 app.use(express.static(path.join(__dirname, "/frontend/dist"))); // Serve the static files
 app.get("*", (req, res) => {

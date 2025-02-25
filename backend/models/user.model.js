@@ -6,9 +6,10 @@ const User = sequelize.define(
   "User",
   {
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
+      defaultValue: () =>
+        Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       primaryKey: true,
-      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING(50),
@@ -38,8 +39,15 @@ const User = sequelize.define(
       allowNull: false,
     },
     branchId: {
-      type: DataTypes.STRING(10),
       allowNull: false,
+      references: {
+        model: `branches`,
+        key: "branchId",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
+      type: DataTypes.STRING,
+      type: DataTypes.STRING,
     },
   },
   {
@@ -47,7 +55,6 @@ const User = sequelize.define(
     timestamps: true,
     hooks: {
       beforeSave: async (user) => {
-        console.log("Before saved called");
         if (user.changed("password")) {
           const salt = await bcryptjs.genSalt(10);
           user.password = await bcryptjs.hash(user.password, salt);

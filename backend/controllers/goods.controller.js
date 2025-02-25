@@ -1,7 +1,7 @@
-import sequelize from "../db/connect.db.js";
 import defineCategoryModel from "../models/category.model.js";
 import defineGoodsModel from "../models/good.models.js";
 import { Op } from "sequelize";
+import Branch from "../models/branch.model.js";
 
 export const getGoodByCategoryNames = async (req, res) => {
   try {
@@ -13,9 +13,10 @@ export const getGoodByCategoryNames = async (req, res) => {
     if (!category) {
       return res.status(400).json({ error: "Category not provided" });
     }
-    if (!(await checkIfTableExists(`categories_${branchId}`))) {
+
+    if (!(await Branch.findOne({ where: { branchId } }))) {
       return res.status(400).json({
-        error: "Table does not exist",
+        error: "This branch does not exist",
       });
     }
     const categoryIds = await getCategoryIdByCategoryName(category, branchId);
@@ -40,6 +41,7 @@ export const getGoodByCategoryNames = async (req, res) => {
 
     return res.status(200).json({ data: allGoods });
   } catch (error) {
+    console.log("Error getting goods by category names: " + error.message);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -53,8 +55,10 @@ export const addNewGood = async (req, res) => {
     if (!branchId) {
       return res.status(400).json({ error: "Branch ID not provided" });
     }
-    if (!(await checkIfTableExists(`categories_${branchId}`))) {
-      await makeNewTable(branchId);
+    if (!(await Branch.findOne({ where: { branchId } }))) {
+      return res.status(400).json({
+        error: "This branch does not exist",
+      });
     }
 
     const branchCategory = defineCategoryModel(branchId);
@@ -62,6 +66,7 @@ export const addNewGood = async (req, res) => {
 
     const { name, price, description, quantity, tax, category } = good;
     const goodExists = await branchGood.findOne({ where: { name: name } });
+
     if (goodExists) {
       return res.status(400).json({ error: "Good already exists" });
     }
@@ -80,10 +85,10 @@ export const addNewGood = async (req, res) => {
       tax,
       categoryId: categoryInstance.categoryId,
     });
-    console.log("New good created");
+
     return res.status(200).json({ message: "Good created successfully" });
   } catch (error) {
-    console.log(error);
+    console.error("Error creating good:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -99,9 +104,9 @@ export const modifyGoodByItemId = async (req, res) => {
     if (!itemId) {
       return res.status(400).json({ error: "Item id is required" });
     }
-    if (!(await checkIfTableExists(`categories_${branchId}`))) {
+    if (!(await Branch.findOne({ where: { branchId } }))) {
       return res.status(400).json({
-        error: "Table does not exist",
+        error: "This branch does not exist",
       });
     }
 
@@ -131,7 +136,8 @@ export const modifyGoodByItemId = async (req, res) => {
     }
     return res.status(200).json({ message: "Update successful" });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log("Error updating good by id: " + err.message);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -141,8 +147,8 @@ export const deleteGoodByItemId = async (req, res) => {
     if (!branchId) return res.status(400).json({ error: "BranchId not found" });
     if (!itemIds || itemIds.length === 0)
       return res.status(400).json({ error: "ItemId not found" });
-    if (!(await checkIfTableExists(`categories_${branchId}`)))
-      return res.status(400).json({ error: "Table does not exist" });
+    if (!(await Branch.findOne({ where: { branchId } })))
+      return res.status(400).json({ error: "This branch does not exist" });
 
     const branchGood = defineGoodsModel(branchId);
     const deletedRows = await branchGood.destroy({
@@ -156,7 +162,8 @@ export const deleteGoodByItemId = async (req, res) => {
         : `Rows deleted successfully: ${deletedRows}`;
     return res.status(200).json({ message: resMsg });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log("Error deleting good by item id: " + err.message);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -166,8 +173,8 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
     if (!branchId) return res.status(400).json({ error: "BranchId not found" });
     if (!categoryIds || categoryIds.length === 0)
       return res.status(400).json({ error: "categories not found" });
-    if (!(await checkIfTableExists(`categories_${branchId}`)))
-      return res.status(400).json({ error: "Table does not exist" });
+    if (!(await Branch.findOne({ where: { branchId } })))
+      return res.status(400).json({ error: "This branch does not exist" });
 
     const branchCategory = defineCategoryModel(branchId);
     const deletedRows = await branchCategory.destroy({
@@ -179,10 +186,11 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
     const resMsg =
       deletedRows === 0
         ? "Nothing to delete"
-        : `Rows deleted successfully + ${deletedRows}`;
+        : `Rows deleted successfully: ${deletedRows}`;
     return res.status(200).json({ message: resMsg });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    console.log("Error deleting categories by ids: " + err.message);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -193,35 +201,6 @@ const isGoodNonEmpty = (good) => {
     return false;
   }
   return true;
-};
-
-const checkIfTableExists = async (tableName) => {
-  try {
-    const queryInterface = sequelize.getQueryInterface();
-    const tables = await queryInterface.showAllSchemas();
-
-    const tableExists = tables.some((schema) => {
-      return schema.Tables_in_goods_management === tableName;
-    });
-    // console.log(tables);
-    console.log(`Table ${tableName} exists:`, tableExists);
-    return tableExists;
-  } catch (error) {
-    console.error(`Error checking table existence for ${tableName}:`, error);
-    return false;
-  }
-};
-
-const makeNewTable = async (branchId) => {
-  try {
-    const Category = defineCategoryModel(branchId);
-    const Goods = defineGoodsModel(branchId);
-    await Category.sync({ force: false });
-    await Goods.sync({ force: false });
-    console.log("New table created successfully");
-  } catch (err) {
-    console.log("Error while creating new table", err);
-  }
 };
 
 const getCategoryIdByCategoryName = async (categoryName, branchId) => {

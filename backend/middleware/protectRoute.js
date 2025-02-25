@@ -27,8 +27,6 @@ const protectRoute = async (req, res, next) => {
       error: err.message,
     });
   }
-  // Dummy code for rn
-  next();
 };
 
 export default protectRoute;

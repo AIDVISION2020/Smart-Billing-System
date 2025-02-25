@@ -8,9 +8,10 @@ const defineGoodsModel = (branchId) => {
     "Goods",
     {
       itemId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
+        defaultValue: () =>
+          Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
         primaryKey: true,
-        autoIncrement: true,
       },
       name: {
         type: DataTypes.STRING(100),
@@ -27,7 +28,7 @@ const defineGoodsModel = (branchId) => {
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
       },
       price: {
         type: DataTypes.DECIMAL(10, 2),
@@ -40,14 +41,6 @@ const defineGoodsModel = (branchId) => {
       tax: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
       },
     },
     {
