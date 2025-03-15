@@ -39,7 +39,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     branchId: {
-      allowNull: false,
+      defaultValue: "0",
       references: {
         model: `branches`,
         key: "branchId",
@@ -48,6 +48,10 @@ const User = sequelize.define(
       onDelete: "CASCADE",
       type: DataTypes.STRING,
       type: DataTypes.STRING,
+    },
+    role: {
+      type: DataTypes.ENUM("admin", "user"),
+      defaultValue: "user",
     },
   },
   {

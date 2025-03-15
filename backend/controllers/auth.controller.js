@@ -4,14 +4,13 @@ import generateTokenAndSetCookie from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import Branch from "../models/branch.model.js";
 
-export const signupUserController = async (req, res) => {
+export const createUserController = async (req, res) => {
   try {
-    if (isSomeoneLoggedIn(req))
-      return res.status(400).json({ error: "User already logged in" });
     const { userInfo } = req.body;
     if (!userInfo)
       return res.status(400).json({ error: "Insufficient user data" });
-    const { username, name, email, password, confirmPassword, branchId } =
+
+    const { username, name, email, password, confirmPassword, branchId, role } =
       userInfo;
 
     if (
@@ -37,7 +36,8 @@ export const signupUserController = async (req, res) => {
       name,
       email,
       password,
-      branchId,
+      branchId: role === "admin" ? "0" : branchId,
+      role: role ? role : "user",
     });
 
     return res.status(200).json({ message: "User created successfully" });
@@ -72,6 +72,7 @@ export const loginUserController = async (req, res) => {
       email: foundUser.email,
       username: foundUser.username,
       branchId: foundUser.branchId,
+      role: foundUser.role,
       message: "Login successful",
     });
   } catch (err) {
@@ -97,5 +98,5 @@ const isSomeoneLoggedIn = (req) => {
   if (!token) return false;
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   if (!decoded) return false;
-  return true;
+  return decoded;
 };

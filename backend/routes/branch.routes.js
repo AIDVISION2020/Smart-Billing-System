@@ -4,12 +4,12 @@ import {
   deleteBranchByIdController,
   updateBranchController,
 } from "../controllers/branch.controller.js";
-import protectRoute from "../middleware/protectRoute.js";
+import checkAdmin from "../middleware/checkAdmin.js";
 
 const router = express.Router();
 
-router.post("/newBranch", protectRoute, addNewBranchController);
-router.delete("/deleteBranch", protectRoute, deleteBranchByIdController);
-router.patch("/updateBranch", protectRoute, updateBranchController);
+router.post("/newBranch", checkAdmin, addNewBranchController);
+router.delete("/deleteBranch", checkAdmin, deleteBranchByIdController);
+router.patch("/updateBranch", checkAdmin, updateBranchController);
 
 export default router;

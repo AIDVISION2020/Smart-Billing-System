@@ -14,11 +14,9 @@ const Branch = sequelize.define(
     },
     goodsTableName: {
       type: DataTypes.STRING(50),
-      allowNull: false,
     },
     categoriesTableName: {
       type: DataTypes.STRING(50),
-      allowNull: false,
     },
   },
   {
