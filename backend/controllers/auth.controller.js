@@ -52,7 +52,7 @@ export const loginUserController = async (req, res) => {
     if (isSomeoneLoggedIn(req))
       return res.status(400).json({ error: "User already logged in" });
     const { email, password } = req.body;
-
+    console.log(password);
     if (!email || !password)
       return res.status(400).json({ error: "Insufficient credentials" });
     const foundUser = await User.findOne({
