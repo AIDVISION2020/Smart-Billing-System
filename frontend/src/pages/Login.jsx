@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import useLogin from "@/hooks/useLogin";
 import Spinner from "@/components/spinner/Spinner";
-import { AppName } from "@/constants/constants.js";
+import { AppNameAcronym } from "@/constants/constants.js";
 
 const Login = () => {
-  document.title = `${AppName} | Sign in`;
+  document.title = `${AppNameAcronym} | Sign in`;
   const [user, setUser] = useState({ email: "", password: "" });
 
   const { loading, login } = useLogin();
@@ -33,7 +33,7 @@ const Login = () => {
               src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
               alt="logo"
             />
-            <b>{AppName}</b>
+            <b>{AppNameAcronym}</b>
           </a>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

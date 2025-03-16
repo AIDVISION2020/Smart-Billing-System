@@ -2,6 +2,7 @@ import Branch from "../models/branch.model.js";
 import defineCategoryModel from "../models/category.model.js";
 import defineGoodsModel from "../models/good.models.js";
 import sequelize from "../db/connect.db.js";
+import { Op } from "sequelize";
 
 export const addNewBranchController = async (req, res) => {
   try {
@@ -116,3 +117,31 @@ export const updateBranchController = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getAccessibleBranchesController = async (req, res) => {
+  try{
+    const {role, branchId} = req.body;
+    if(!role || !branchId) return res.status(400).json({ error: "Could not retrieve needed data" });
+    
+    const accessibleBranches = (
+      await Branch.findAll({
+        where:
+          role !== "admin"
+            ? { branchId }
+            : { branchId: { [Op.ne]: "0" } },
+        attributes: ["branchId", "location"],
+      })
+    ).map((branch) => ({
+      branchId: branch.branchId,
+      location: branch.location,
+    }));
+    
+    return res.status(200).json({
+      accessibleBranches,
+    });
+  }
+  catch(err){
+    console.log("Error while fetching accessible branches: ", err.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}

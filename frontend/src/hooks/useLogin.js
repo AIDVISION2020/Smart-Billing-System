@@ -25,9 +25,11 @@ const useLogin = () => {
         throw new Error(data.error);
       } else if (data.message) {
         toast.success(data.message);
-      } else {
-        localStorage.setItem("sbs-user", JSON.stringify(data));
-        setAuthUser(data);
+        const filteredData = Object.fromEntries(
+          Object.entries(data).filter(([key]) => key !== "message")
+        );
+        localStorage.setItem("sbs-user", JSON.stringify(filteredData));
+        setAuthUser(filteredData);
       }
     } catch (error) {
       toast.error(error.message);
