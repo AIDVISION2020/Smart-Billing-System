@@ -5,6 +5,7 @@ import { User } from "lucide-react";
 import Dropdown from "../components/dropdown/Dropdown.jsx";
 import Logout from "../components/logout/Logout.jsx";
 import BranchCard from "../components/cards/branchCard.jsx";
+import NewBranchCard from "../components/cards/newBranchCard.jsx";
 import Spinner from "../components/spinner/Spinner.jsx";
 import useGetAccessibleBranches from "../hooks/useGetAccessibleBranches.js";
 
@@ -84,6 +85,7 @@ const LandingPage = () => {
                         />
                       );
                     })}
+                    {authUser?.role === "admin" && <NewBranchCard />}
                   </div>
                 )}
               </>

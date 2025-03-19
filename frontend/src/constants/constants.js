@@ -5,6 +5,7 @@ export const APIEndpoints = Object.freeze({
   GETGOODSBYCATEGORIES: "/api/goods/getGoods",
   GETBRANCHES: "/api/branch/getBranches",
   GETACCESSIBLEBRANCHES: "/api/branch/getAccessibleBranches",
+  ADDNEWBRANCH: "/api/branch/newBranch",
 });
 
 export const HomepageNavigations = Object.freeze([
