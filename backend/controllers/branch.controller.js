@@ -102,16 +102,14 @@ export const updateBranchController = async (req, res) => {
     if (updatedRows === 0) {
       return res.status(404).json({ error: "No matching record found" });
     } else {
-      await Promise.all([
-        sequelize
-          .getQueryInterface()
-          .renameTable(`categories_${oldBranchId}`, `categories_${branchId}`),
-        sequelize
-          .getQueryInterface()
-          .renameTable(`goods_${oldBranchId}`, `goods_${branchId}`),
-      ]);
+      await sequelize
+        .getQueryInterface()
+        .renameTable(`categories_${oldBranchId}`, `categories_${branchId}`);
+      await sequelize
+        .getQueryInterface()
+        .renameTable(`goods_${oldBranchId}`, `goods_${branchId}`);
     }
-    return res.status(200).json({ message: "Update successful" });
+    return res.status(200).json({ message: "Branch updated successfully" });
   } catch (err) {
     console.log("Error updating an existing branch: " + err.message);
     return res.status(500).json({ error: "Internal Server Error" });

@@ -1,13 +1,15 @@
 import PropTypes from "prop-types";
-import { MapPin, Trash2 } from "lucide-react";
+import { MapPin, Trash2, Pencil } from "lucide-react";
 import { useAuthContext } from "@/context/authContext";
 import ConfirmModal from "../modals/confirmModal";
 import { useState, useEffect } from "react";
 import useDeleteBranch from "../../hooks/useDeleteBranch";
+import UpdateBranchModal from "../modals/UpdateBranchModal";
 
 const BranchCard = ({ branchId, branchLocation, setBranchListUpdCount }) => {
   const { authUser } = useAuthContext();
   const [response, setResponse] = useState(false);
+  const [openUpdBranchModal, setOpenUpdBranchModal] = useState(false);
 
   const { deleteBranch } = useDeleteBranch();
 
@@ -32,6 +34,26 @@ const BranchCard = ({ branchId, branchLocation, setBranchListUpdCount }) => {
       <div className="group m-2 px-2 py-2 border-4 border-black bg-white dark:bg-gray-700 text-black dark:text-white text-xl rounded-xl flex flex-col justify-evenly items-center min-h-[250px] shadow-lg transition-all duration-300 hover:shadow-xl  hover:border-gray-500 dark:hover:border-gray-400 cursor-pointer">
         {authUser?.role === "admin" && (
           <div className="w-full flex justify-end items-center">
+            {/* Update branch */}
+            <>
+              <Pencil
+                size={24}
+                strokeWidth={3}
+                className="text-blue-600 dark:text-blue-400 transition-all duration-300 group-hover:text-blue-700 dark:group-hover:text-blue-300"
+                onClick={() => setOpenUpdBranchModal(true)}
+              />
+              {openUpdBranchModal && (
+                <UpdateBranchModal
+                  showModal={openUpdBranchModal}
+                  setShowModal={setOpenUpdBranchModal}
+                  setBranchListUpdCount={setBranchListUpdCount}
+                  currBranchId={branchId}
+                  currLocation={branchLocation}
+                />
+              )}
+            </>
+
+            {/* Delete branch */}
             <ConfirmModal
               confirmMessage={confirmMessage}
               yesMessage={yesMessage}
@@ -62,7 +84,7 @@ const BranchCard = ({ branchId, branchLocation, setBranchListUpdCount }) => {
 };
 
 BranchCard.propTypes = {
-  branchId: PropTypes.number.isRequired,
+  branchId: PropTypes.string.isRequired,
   branchLocation: PropTypes.string.isRequired,
   setBranchListUpdCount: PropTypes.func.isRequired,
 };

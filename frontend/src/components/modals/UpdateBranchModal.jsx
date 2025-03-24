@@ -1,21 +1,27 @@
 import { useState } from "react";
-import useAddNewBranch from "../../hooks/useAddNewBranch";
+import useUpdateBranch from "../../hooks/useUpdateBranch";
 import Spinner from "@/components/spinner/Spinner";
-import { X as Close, Plus } from "lucide-react";
+import { X as Close, Save, Replace } from "lucide-react";
+import propTypes from "prop-types";
 
-// eslint-disable-next-line react/prop-types
-const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
-  const [newBranch, setNewBranch] = useState({
+const UpdateBranchModal = ({
+  showModal,
+  setShowModal,
+  setBranchListUpdCount,
+  currBranchId,
+  currLocation,
+}) => {
+  const [updatedBranch, setUpdatedBranch] = useState({
     branchId: "",
     location: "",
   });
 
-  const { loading, addNewBranch } = useAddNewBranch();
+  const { loading, updateBranch } = useUpdateBranch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewBranch({
-      ...newBranch,
+    setUpdatedBranch({
+      ...updatedBranch,
       [name]:
         name === "location"
           ? value.trimStart().toUpperCase()
@@ -25,13 +31,17 @@ const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setNewBranch({
-      branchId: newBranch.branchId.trim(),
-      location: newBranch.location.trim(),
+    setUpdatedBranch({
+      branchId: updatedBranch.branchId.trim(),
+      location: updatedBranch.location.trim(),
     });
-    await addNewBranch(newBranch);
+    await updateBranch({
+      oldBranchId: currBranchId,
+      newBranchId: updatedBranch.branchId,
+      location: updatedBranch.location,
+    });
     setShowModal(false);
-    setNewBranch({ branchId: "", location: "" });
+    setUpdatedBranch({ branchId: "", location: "" });
     setBranchListUpdCount((prev) => prev + 1);
   };
 
@@ -53,7 +63,7 @@ const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b dark:border-gray-700">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              New Branch
+              Update Branch
             </h3>
             <button
               type="button"
@@ -69,43 +79,67 @@ const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
           <form className="p-6 space-y-6" onSubmit={handleSubmit}>
             {/* Branch ID Input */}
             <div>
-              <label
-                htmlFor="branchId"
-                className="block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Branch ID
-              </label>
+              <div className="flex justify-start items-center">
+                <label
+                  htmlFor="branchId"
+                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Branch ID
+                </label>
+                <Replace
+                  size={20}
+                  className="ml-4 text-blue-600 pointer"
+                  onClick={() => {
+                    setUpdatedBranch({
+                      ...updatedBranch,
+                      branchId: currBranchId,
+                    });
+                  }}
+                />
+              </div>
               <input
                 type="text"
                 name="branchId"
                 id="branchId"
-                className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                placeholder="Enter Branch ID"
+                className="text-md w-full px-4 py-2 mt-2 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                placeholder={`Current: ${currBranchId}`}
                 required
                 minLength={1}
                 maxLength={10}
-                value={newBranch.branchId}
+                value={updatedBranch.branchId}
                 onChange={handleChange}
               />
             </div>
 
             {/* Location Input */}
             <div>
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Location
-              </label>
+              <div className="flex justify-start items-center">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Location
+                </label>
+                <Replace
+                  size={20}
+                  className="ml-4 text-blue-600 pointer"
+                  onClick={() => {
+                    setUpdatedBranch({
+                      ...updatedBranch,
+                      location: currLocation,
+                    });
+                  }}
+                />
+              </div>
               <input
                 name="location"
                 id="location"
                 className="w-full px-4 py-2 mt-2 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                placeholder="Enter Branch Location"
+                placeholder={`Current: ${currLocation}`}
                 required
                 minLength={2}
                 maxLength={20}
-                value={newBranch.location}
+                value={updatedBranch.location}
                 onChange={handleChange}
               ></input>
             </div>
@@ -119,8 +153,8 @@ const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
                 <Spinner dotStyles="bg-white h-3 w-3" />
               ) : (
                 <>
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add Branch
+                  <Save className="w-5 h-5 mr-2" />
+                  Update Branch
                 </>
               )}
             </button>
@@ -131,4 +165,12 @@ const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
   );
 };
 
-export default NewBranchModal;
+UpdateBranchModal.propTypes = {
+  showModal: propTypes.bool.isRequired,
+  setShowModal: propTypes.func.isRequired,
+  setBranchListUpdCount: propTypes.func.isRequired,
+  currBranchId: propTypes.string.isRequired,
+  currLocation: propTypes.string.isRequired,
+};
+
+export default UpdateBranchModal;
