@@ -159,7 +159,7 @@ export const deleteGoodByItemId = async (req, res) => {
     const resMsg =
       deletedRows === 0
         ? "Nothing to delete"
-        : `Rows deleted successfully: ${deletedRows}`;
+        : ` ${deletedRows} good deleted succesfully`;
     return res.status(200).json({ message: resMsg });
   } catch (err) {
     console.log("Error deleting good by item id: " + err.message);

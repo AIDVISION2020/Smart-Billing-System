@@ -6,6 +6,8 @@ export const APIEndpoints = Object.freeze({
   GETBRANCHES: "/api/branch/getBranches",
   GETACCESSIBLEBRANCHES: "/api/branch/getAccessibleBranches",
   ADDNEWBRANCH: "/api/branch/newBranch",
+  DELETEBRANCH: "/api/branch/deleteBranch",
+  UPDATEBRANCH: "/api/branch/updateBranch",
 });
 
 export const HomepageNavigations = Object.freeze([

@@ -1,8 +1,9 @@
 import { CirclePlus } from "lucide-react";
 import NewBranchModal from "../modals/NewBranchModal";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
-const NewBranchCard = () => {
+const NewBranchCard = ({ setBranchListUpdCount }) => {
   const [showModal, setShowModal] = useState(false);
   return (
     <>
@@ -17,10 +18,18 @@ const NewBranchCard = () => {
         />
       </div>
       {showModal && (
-        <NewBranchModal showModal={showModal} setShowModal={setShowModal} />
+        <NewBranchModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          setBranchListUpdCount={setBranchListUpdCount}
+        />
       )}
     </>
   );
+};
+
+NewBranchCard.propTypes = {
+  setBranchListUpdCount: PropTypes.func.isRequired,
 };
 
 export default NewBranchCard;

@@ -56,7 +56,7 @@ export const deleteBranchByIdController = async (req, res) => {
     let resMsg;
     if (deletedRows.length === 0) resMsg = "Nothing to delete";
     else {
-      resMsg = `Rows deleted successfully: ${deletedRows}`;
+      resMsg = `${deletedRows} branch deleted successfully`;
       await sequelize.getQueryInterface().dropTable(`goods_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`categories_${branchId}`);
     }
@@ -119,29 +119,26 @@ export const updateBranchController = async (req, res) => {
 };
 
 export const getAccessibleBranchesController = async (req, res) => {
-  try{
-    const {role, branchId} = req.body;
-    if(!role || !branchId) return res.status(400).json({ error: "Could not retrieve needed data" });
-    
+  try {
+    const { role, branchId } = req.body;
+    if (!role || !branchId)
+      return res.status(400).json({ error: "Could not retrieve needed data" });
+
     const accessibleBranches = (
       await Branch.findAll({
-        where:
-          role !== "admin"
-            ? { branchId }
-            : { branchId: { [Op.ne]: "0" } },
+        where: role !== "admin" ? { branchId } : { branchId: { [Op.ne]: "0" } },
         attributes: ["branchId", "location"],
       })
     ).map((branch) => ({
       branchId: branch.branchId,
       location: branch.location,
     }));
-    
+
     return res.status(200).json({
       accessibleBranches,
     });
-  }
-  catch(err){
+  } catch (err) {
     console.log("Error while fetching accessible branches: ", err.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};

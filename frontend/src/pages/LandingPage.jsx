@@ -10,6 +10,8 @@ import Spinner from "../components/spinner/Spinner.jsx";
 import useGetAccessibleBranches from "../hooks/useGetAccessibleBranches.js";
 
 const LandingPage = () => {
+  const [branchListUpdCount, setBranchListUpdCount] = useState(0);
+
   const { authUser } = useAuthContext();
   const { loading, getAccessibleBranches } = useGetAccessibleBranches();
   const [accessibleBranches, setAccessibleBranches] = useState([]);
@@ -20,7 +22,7 @@ const LandingPage = () => {
       setAccessibleBranches(branches);
     };
     fetchAccessibleBranches();
-  }, [getAccessibleBranches]);
+  }, [branchListUpdCount, getAccessibleBranches]);
 
   const dropDownElements = [
     <div
@@ -82,10 +84,15 @@ const LandingPage = () => {
                           key={branch.branchId}
                           branchId={branch.branchId}
                           branchLocation={branch.location}
+                          setBranchListUpdCount={setBranchListUpdCount}
                         />
                       );
                     })}
-                    {authUser?.role === "admin" && <NewBranchCard />}
+                    {authUser?.role === "admin" && (
+                      <NewBranchCard
+                        setBranchListUpdCount={setBranchListUpdCount}
+                      />
+                    )}
                   </div>
                 )}
               </>

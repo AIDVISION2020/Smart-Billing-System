@@ -4,7 +4,7 @@ import Spinner from "@/components/spinner/Spinner";
 import { X as Close, Plus } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
-const NewBranchModal = ({ showModal, setShowModal }) => {
+const NewBranchModal = ({ showModal, setShowModal, setBranchListUpdCount }) => {
   const [newBranch, setNewBranch] = useState({
     branchId: "",
     location: "",
@@ -32,6 +32,7 @@ const NewBranchModal = ({ showModal, setShowModal }) => {
     await addNewBranch(newBranch);
     setShowModal(false);
     setNewBranch({ branchId: "", location: "" });
+    setBranchListUpdCount((prev) => prev + 1);
   };
 
   return (
