@@ -1,9 +1,9 @@
 import express from "express";
 import {
   getGoodByCategoryNames,
-  addNewGood,
+  addNewGoods,
   modifyGoodByItemId,
-  deleteGoodByItemId,
+  deleteGoodsByItemIds,
   deleteCategoriesByCategoryIds,
 } from "../controllers/goods.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
@@ -11,9 +11,9 @@ import protectRoute from "../middleware/protectRoute.js";
 const router = express.Router();
 
 router.post("/getGoods", protectRoute, getGoodByCategoryNames);
-router.post("/addGood", protectRoute, addNewGood);
+router.post("/addGoods", protectRoute, addNewGoods);
 router.post("/modifyGood", protectRoute, modifyGoodByItemId);
-router.delete("/deleteGood", protectRoute, deleteGoodByItemId);
-router.delete("/deleteCategory", protectRoute, deleteCategoriesByCategoryIds);
+router.delete("/deleteGoods", protectRoute, deleteGoodsByItemIds);
+router.delete("/deleteCategories", protectRoute, deleteCategoriesByCategoryIds);
 
 export default router;

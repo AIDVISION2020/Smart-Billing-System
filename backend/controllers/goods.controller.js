@@ -19,7 +19,7 @@ export const getGoodByCategoryNames = async (req, res) => {
         error: "This branch does not exist",
       });
     }
-    const categoryIds = await getCategoryIdByCategoryName(category, branchId);
+    const categoryIds = category.map((catInst) => catInst.categoryId);
     const whereCondition =
       categoryIds.length > 0
         ? {
@@ -46,12 +46,10 @@ export const getGoodByCategoryNames = async (req, res) => {
   }
 };
 
-export const addNewGood = async (req, res) => {
+export const addNewGoods = async (req, res) => {
   try {
-    const { good, branchId } = req.body;
-    if (!isGoodNonEmpty(good)) {
-      return res.status(400).json({ error: "Invalid good data" });
-    }
+    const { goods: allGoods, branchId } = req.body;
+    // console.log("allGoods", allGoods);
     if (!branchId) {
       return res.status(400).json({ error: "Branch ID not provided" });
     }
@@ -63,30 +61,49 @@ export const addNewGood = async (req, res) => {
 
     const branchCategory = defineCategoryModel(branchId);
     const branchGood = defineGoodsModel(branchId);
-
-    const { name, price, description, quantity, tax, category } = good;
-    const goodExists = await branchGood.findOne({ where: { name: name } });
-
-    if (goodExists) {
-      return res.status(400).json({ error: "Good already exists" });
-    }
-    let categoryInstance = await branchCategory.findOne({
-      where: { name: category },
-    });
-    if (!categoryInstance) {
-      categoryInstance = await branchCategory.create({ name: category });
+    const goods = getFullGoods(allGoods);
+    console.log("goods", goods);
+    if (goods.length === 0) {
+      return res.status(400).json({ error: "No goods provided" });
     }
 
-    await branchGood.create({
-      name,
-      price,
-      description,
-      quantity,
-      tax,
-      categoryId: categoryInstance.categoryId,
-    });
+    // Step 1: Count occurrences of each name
+    const nameCounts = goods.reduce((acc, good) => {
+      acc[good.name] = (acc[good.name] || 0) + 1;
+      return acc;
+    }, {});
 
-    return res.status(200).json({ message: "Good created successfully" });
+    // Step 2: Filter out goods that appear more than once
+    const uniqueGoods = goods.filter((good) => nameCounts[good.name] === 1);
+
+    let validGoods = [];
+
+    for (const good of uniqueGoods) {
+      const { name, price, description, quantity, tax, category } = good;
+      const goodExists = await branchGood.findOne({ where: { name } });
+      if (goodExists) continue;
+
+      let categoryInstance = await branchCategory.findOne({
+        where: { name: category },
+      });
+      if (!categoryInstance) {
+        categoryInstance = await branchCategory.create({ name: category });
+      }
+
+      validGoods.push({
+        name,
+        price,
+        description,
+        quantity,
+        tax,
+        categoryId: categoryInstance.categoryId,
+      });
+    }
+
+    await branchGood.bulkCreate(validGoods);
+    return res
+      .status(200)
+      .json({ message: `${validGoods.length} goods created successfully` });
   } catch (error) {
     console.error("Error creating good:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -141,7 +158,7 @@ export const modifyGoodByItemId = async (req, res) => {
   }
 };
 
-export const deleteGoodByItemId = async (req, res) => {
+export const deleteGoodsByItemIds = async (req, res) => {
   try {
     const { itemIds, branchId } = req.body;
     if (!branchId) return res.status(400).json({ error: "BranchId not found" });
@@ -186,7 +203,7 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
     const resMsg =
       deletedRows === 0
         ? "Nothing to delete"
-        : `Rows deleted successfully: ${deletedRows}`;
+        : `${deletedRows} categories deleted successfully `;
     return res.status(200).json({ message: resMsg });
   } catch (err) {
     console.log("Error deleting categories by ids: " + err.message);
@@ -194,33 +211,32 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
   }
 };
 
-const isGoodNonEmpty = (good) => {
+const getFullGoods = (goods) => {
+  let fullGoods = [];
+  for (let good of goods) {
+    if (isGoodValid(good)) {
+      fullGoods.push(good);
+    }
+  }
+  return fullGoods;
+};
+
+const isGoodValid = (good) => {
+  console.log("good", good);
   if (!good) return false;
   const { name, price, description, quantity, tax, category } = good;
-  if (!name || !price || !description || !quantity || !tax || !category) {
+  if (
+    !name ||
+    price === null ||
+    price === undefined ||
+    !description ||
+    quantity === null ||
+    quantity === undefined ||
+    tax === null ||
+    tax === undefined ||
+    !category
+  ) {
     return false;
   }
   return true;
-};
-
-const getCategoryIdByCategoryName = async (categoryName, branchId) => {
-  try {
-    const branchCategory = defineCategoryModel(branchId);
-    const categoryObjs = await branchCategory.findAll({
-      where: {
-        name: {
-          [Op.in]: categoryName,
-        },
-      },
-    });
-    let categoryIds = [];
-    categoryObjs.forEach((category) => {
-      categoryIds.push(category.dataValues.categoryId);
-    });
-    return categoryIds;
-  } catch (err) {
-    console.error(
-      `Error converting category name to category id: ${err.message}`
-    );
-  }
 };

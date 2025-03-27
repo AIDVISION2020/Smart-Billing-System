@@ -1,0 +1,276 @@
+import propTypes from "prop-types";
+import { useState } from "react";
+import { Check, Plus } from "lucide-react";
+
+const NewGood = ({ newGoods, setNewGoods }) => {
+  const [newGood, setNewGood] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    quantity: 0,
+    tax: 0,
+    category: "",
+  });
+  const [addGoodErrors, setAddGoodErrors] = useState({
+    name: "",
+    description: "",
+  });
+
+  const handleAddNewGood = () => {
+    let newErrors = {};
+    if (!newGood.name.trim()) newErrors.name = "Item name is required!";
+    if (!newGood.description.trim())
+      newErrors.description = "Description cannot be empty!";
+    if (!newGood.category.trim()) newErrors.category = "Category is required!";
+    if (newGood.quantity < 1)
+      newErrors.quantity = "Quantity cannot be less than 1!";
+    if (!Number.isInteger(Number(newGood.quantity)))
+      newErrors.quantity = "Quantity must be an integer!";
+
+    if (newGood.price < 0) newErrors.price = "Price cannot be less than 0!";
+    if (newGood.tax < 0 || newGood.tax > 100)
+      newErrors.tax = "Tax must be between 0 and 100!";
+
+    if (Object.keys(newErrors).length > 0) {
+      setAddGoodErrors(newErrors); // Show addGoodErrors
+      return;
+    }
+
+    setAddGoodErrors({});
+    setNewGoods([...newGoods, newGood]),
+      setNewGood((prev) => ({
+        ...prev,
+        name: "",
+        description: "",
+        price: 0,
+        quantity: 0,
+        tax: 0,
+        category: "",
+      }));
+  };
+
+  return (
+    <div className="w-full flex flex-col">
+      <div className="w-full text-center mt-10 mb-6 font-bold text-xl sm:text-2xl uppercase flex items-center justify-center">
+        <Plus size={30} strokeWidth={3} className="inline-block" />
+        <span>Add goods</span>
+      </div>
+      <div className="relative overflow-x-auto shadow-lg rounded-lg">
+        <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300">
+          <thead className="text-sm uppercase bg-gray-200 dark:bg-gray-900 dark:text-gray-400 font-bold">
+            <tr>
+              {[
+                "Item Name",
+                "Description",
+                "Category",
+                "Price",
+                "Quantity",
+                "Tax (%)",
+              ].map((header) => (
+                <th
+                  key={header}
+                  scope="col"
+                  className="px-6 py-4 tracking-wide"
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {newGoods.map((good, index) => (
+              <tr
+                key={index}
+                className={`border-b dark:border-gray-700 ${
+                  index % 2 === 0
+                    ? "bg-gray-50 dark:bg-gray-800"
+                    : "bg-white dark:bg-gray-900"
+                } hover:bg-gray-200 dark:hover:bg-gray-700 transition-all`}
+              >
+                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  {good.name}
+                </td>
+                <td className="px-6 py-4 font-semibold">{good.description}</td>
+                <td className="px-6 py-4 font-semibold">{good.category}</td>
+                <td className="px-6 py-4 font-semibold text-green-600 dark:text-green-400">
+                  ₹{good.price}
+                </td>
+                <td
+                  className={`px-6 py-4  font-semibold ${
+                    good.quantity < 100 && "text-red-600"
+                  }`}
+                >
+                  {good.quantity}
+                </td>
+                <td className="px-6 py-4 font-semibold">{good.tax}%</td>
+              </tr>
+            ))}
+            <tr className="border-b dark:border-gray-700 bg-white dark:bg-gray-900">
+              <td className="px-6 py-4">
+                <input
+                  type="text"
+                  placeholder="Item Name"
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.name
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.name}
+                  required={true}
+                  min={3}
+                  max={50}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, name: e.target.value })
+                  }
+                />
+                {addGoodErrors.name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.name}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
+                  type="text"
+                  placeholder="Description"
+                  required={true}
+                  min={3}
+                  max={50}
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.description
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.description}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, description: e.target.value })
+                  }
+                />
+                {addGoodErrors.description && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.description}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
+                  type="text"
+                  placeholder="Item Category"
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.category
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.category}
+                  required={true}
+                  min={3}
+                  max={50}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, category: e.target.value })
+                  }
+                />
+                {addGoodErrors.category && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.category}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
+                  type="number"
+                  placeholder="Price"
+                  min={0}
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.price
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.price}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, price: e.target.value })
+                  }
+                />
+                {addGoodErrors.price && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.price}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
+                  type="number"
+                  placeholder="Quantity"
+                  min={1}
+                  max={999999999}
+                  required={true}
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.quantity
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.quantity}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, quantity: e.target.value })
+                  }
+                />
+                {addGoodErrors.quantity && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.quantity}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
+                  type="number"
+                  placeholder="Tax (%)"
+                  min={0}
+                  max={100}
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.tax
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.tax}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, tax: e.target.value })
+                  }
+                />
+                {addGoodErrors.tax && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.tax}
+                  </p>
+                )}
+              </td>
+              <td>
+                <button
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    newGood.name.trim() &&
+                    newGood.description.trim() &&
+                    newGood.category.trim() &&
+                    newGood.quantity > 0 &&
+                    newGood.price > 0 &&
+                    newGood.tax >= 0 &&
+                    newGood.tax <= 100 &&
+                    Number.isInteger(Number(newGood.quantity))
+                      ? "bg-green-500 text-white hover:bg-green-600"
+                      : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  }`}
+                  onClick={() => handleAddNewGood()}
+                >
+                  <Check size={17} strokeWidth={2.5} />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+NewGood.propTypes = {
+  newGoods: propTypes.array.isRequired,
+  setNewGoods: propTypes.func.isRequired,
+};
+
+export default NewGood;

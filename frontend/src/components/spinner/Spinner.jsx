@@ -12,7 +12,7 @@ const Spinner = ({
     >
       {loadingMessage ? (
         <div
-          className={`animate-bounce text-white text-lg font-bold ${loadingMessageStyles}`}
+          className={`animate-bounce text-lg font-bold ${loadingMessageStyles} `}
         >
           {loadingMessage}
         </div>

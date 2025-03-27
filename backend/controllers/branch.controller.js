@@ -140,3 +140,30 @@ export const getAccessibleBranchesController = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getAllCategoriesFromBranchId = async (req, res) => {
+  try {
+    const { branchId } = req.body;
+    if (!branchId)
+      return res.status(400).json({ error: "BranchId is required" });
+    if (!(await Branch.findOne({ where: { branchId } })))
+      return res.status(400).json({ error: "This branch does not exist" });
+
+    const branchCategory = defineCategoryModel(branchId);
+    const allCategories = (
+      await branchCategory.findAll({
+        attributes: ["categoryId", "name"],
+      })
+    ).map((category) => ({
+      categoryId: category.categoryId,
+      name: category.name,
+    }));
+
+    return res.status(200).json({
+      allCategories,
+    });
+  } catch (err) {
+    console.log("Error while fetching categories: ", err.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};

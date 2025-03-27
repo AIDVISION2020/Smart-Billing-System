@@ -8,6 +8,12 @@ export const APIEndpoints = Object.freeze({
   ADDNEWBRANCH: "/api/branch/newBranch",
   DELETEBRANCH: "/api/branch/deleteBranch",
   UPDATEBRANCH: "/api/branch/updateBranch",
+  GETCATEGORIESFROMBRANCHID: "/api/branch/getCategories",
+  GETGOODSBYCATEGORYNAMES: "/api/goods/getGoods",
+  DELETECATEGORIES: "/api/goods/deleteCategories",
+  DELETEGOODS: "/api/goods/deleteGoods",
+  MODIFYGOOD: "/api/goods/modifyGood",
+  ADDGOODS: "/api/goods/addGoods",
 });
 
 export const HomepageNavigations = Object.freeze([
