@@ -126,7 +126,6 @@ export const modifyGoodByItemId = async (req, res) => {
         error: "This branch does not exist",
       });
     }
-
     const branchGood = defineGoodsModel(branchId);
 
     const updateData = Object.entries({

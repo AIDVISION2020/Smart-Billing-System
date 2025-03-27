@@ -82,7 +82,7 @@ const BranchCategories = ({
   useEffect(() => {
     const addNewGoods = async () => {
       await addGoods({ goods: newGoods, branchId });
-      // setNewGoods([]);
+      setNewGoods([]);
       setAddResponse(false);
       setCategoryListChangedCnt((prev) => prev + 1);
     };
@@ -133,6 +133,10 @@ const BranchCategories = ({
                 key={category.categoryId}
                 setDeleteCategoriesSelection={setDeleteCategoriesSelection}
                 showCheckbox={newGoods.length === 0}
+                showEditGoodOption={
+                  newGoods.length === 0 &&
+                  deleteCategoriesSelection.length === 0
+                }
               />
             );
           })}
@@ -147,20 +151,22 @@ const BranchCategories = ({
           setResponse={setDeleteResponse}
         />
       ) : (
-        <NewGood
-          branchId={branchId}
-          setNewGoods={setNewGoods}
-          newGoods={newGoods}
-        />
-      )}
-      {newGoods.length > 0 && (
-        <ConfirmModal
-          confirmMessage={confirmMessage_Add}
-          yesMessage={yesMessage_Add}
-          noMessage={noMessage}
-          toggalModalMessage={toggalModalMessage_Add}
-          setResponse={setAddResponse}
-        />
+        <>
+          <NewGood
+            branchId={branchId}
+            setNewGoods={setNewGoods}
+            newGoods={newGoods}
+          />
+          {newGoods.length > 0 && (
+            <ConfirmModal
+              confirmMessage={confirmMessage_Add}
+              yesMessage={yesMessage_Add}
+              noMessage={noMessage}
+              toggalModalMessage={toggalModalMessage_Add}
+              setResponse={setAddResponse}
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -1,6 +1,15 @@
 import propTypes from "prop-types";
+import UpdateGoodModal from "../modals/UpdateGoodModal";
+import { useState } from "react";
+import { Pencil } from "lucide-react";
 
-const GoodsTable = ({ goods }) => {
+const GoodsTable = ({
+  goods,
+  showEditGoodOption,
+  setGoodListChangedCnt,
+  branchId,
+  categoryName,
+}) => {
   const findLastUpdate = (lastUpdate) => {
     const date = new Date(lastUpdate);
     const formattedDate = date.toLocaleDateString("en-US", {
@@ -10,9 +19,10 @@ const GoodsTable = ({ goods }) => {
       hour: "2-digit",
       minute: "2-digit",
     });
-
     return formattedDate;
   };
+  const [openUpdGoodModal, setOpenUpdGoodModal] = useState(false);
+  const [currGood, setCurrGood] = useState({});
 
   return (
     <>
@@ -70,10 +80,31 @@ const GoodsTable = ({ goods }) => {
                 <td className="px-6 py-4 font-semibold text-gray-500 dark:text-gray-400">
                   {findLastUpdate(good.updatedAt)}
                 </td>
+                {showEditGoodOption && (
+                  <td className="px-6 py-4 font-semibold hove">
+                    <Pencil
+                      size={20}
+                      className="text-blue-600 cursor-pointer"
+                      onClick={() => {
+                        setOpenUpdGoodModal(true), setCurrGood(good);
+                      }}
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
+        {openUpdGoodModal && (
+          <UpdateGoodModal
+            categoryName={categoryName}
+            showModal={openUpdGoodModal}
+            setShowModal={setOpenUpdGoodModal}
+            setGoodListChangedCnt={setGoodListChangedCnt}
+            branchId={branchId}
+            currGood={currGood}
+          />
+        )}
       </div>
     </>
   );
@@ -81,6 +112,10 @@ const GoodsTable = ({ goods }) => {
 
 GoodsTable.propTypes = {
   goods: propTypes.array.isRequired,
+  showEditGoodOption: propTypes.func.isRequired,
+  setGoodListChangedCnt: propTypes.func.isRequired,
+  branchId: propTypes.string.isRequired,
+  categoryName: propTypes.string.isRequired,
 };
 
 export default GoodsTable;

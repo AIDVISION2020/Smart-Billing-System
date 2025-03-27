@@ -10,10 +10,12 @@ const IndividualBranchCategory = ({
   branchId,
   setDeleteCategoriesSelection,
   showCheckbox,
+  showEditGoodOption,
 }) => {
   const [included, setIncluded] = useState(false);
   const [goods, setGoods] = useState([]);
   const { loading, getGoods } = useGetGoodsByCategoryNames();
+  const [goodListChangedCnt, setGoodListChangedCnt] = useState(0);
 
   useEffect(() => {
     if (included) {
@@ -28,7 +30,7 @@ const IndividualBranchCategory = ({
 
       fetchGoods();
     } else setGoods([]);
-  }, [included, category, getGoods, branchId]);
+  }, [included, category, getGoods, branchId, goodListChangedCnt]);
 
   return (
     <div key={category.categoryId}>
@@ -48,7 +50,13 @@ const IndividualBranchCategory = ({
               dotStyles={"!animate-none"}
             />
           ) : (
-            <GoodsTable goods={goods} />
+            <GoodsTable
+              goods={goods}
+              showEditGoodOption={showEditGoodOption}
+              setGoodListChangedCnt={setGoodListChangedCnt}
+              branchId={branchId}
+              categoryName={category.name}
+            />
           )}
         </div>
       )}
@@ -61,6 +69,8 @@ IndividualBranchCategory.propTypes = {
   category: propTypes.object.isRequired,
   branchId: propTypes.string.isRequired,
   setDeleteCategoriesSelection: propTypes.func.isRequired,
+  showEditGoodOption: propTypes.bool,
+  setEditingGood: propTypes.func,
 };
 
 export default IndividualBranchCategory;
