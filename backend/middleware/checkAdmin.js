@@ -19,7 +19,7 @@ const checkAdmin = async (req, res, next) => {
       attributes: ["role"],
     });
 
-    if (user.role !== "admin")
+    if (user?.role !== "admin")
       return res
         .status(403)
         .json({ error: "Forbidden - Admin access required" });
@@ -27,7 +27,7 @@ const checkAdmin = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log("Protect route error: " + err.message);
+    console.log("Check admin error: " + err.message);
     return res.status(500).json({
       error: err.message,
     });

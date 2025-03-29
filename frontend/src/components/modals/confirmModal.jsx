@@ -13,8 +13,8 @@ const ConfirmModal = ({
   const [open, setOpen] = useState(false);
 
   const toggleButtonStyle = negativeElement
-    ? "block px-4 py-2 text-sm font-semibold bg-red-600 rounded-lg hover:bg-red-700 text-white text-center"
-    : "block px-4 py-2 text-sm font-semibold text-red-500 hover:bg-gray-100 text-center";
+    ? "block px-4 py-2 text-sm font-semibold bg-red-600 rounded-lg hover:bg-red-700 text-white cursor-pointer text-center"
+    : "block px-4 py-2 text-sm font-semibold text-red-500 cursor-pointer text-center";
 
   return (
     <>

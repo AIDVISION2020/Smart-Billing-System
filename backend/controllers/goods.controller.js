@@ -114,45 +114,33 @@ export const modifyGoodByItemId = async (req, res) => {
   try {
     const { good, branchId } = req.body;
 
-    if (!good) {
-      return res.status(400).json({ error: "Item data is required" });
-    }
-    const { name, description, tax, price, quantity, itemId } = good;
-    if (!itemId) {
-      return res.status(400).json({ error: "Item id is required" });
-    }
-    if (!(await Branch.findOne({ where: { branchId } }))) {
-      return res.status(400).json({
-        error: "This branch does not exist",
-      });
-    }
+    if (!good?.itemId)
+      return res.status(400).json({ error: "Item ID is required" });
+
+    const branchExists = await Branch.count({ where: { branchId } });
+    if (!branchExists)
+      return res.status(400).json({ error: "This branch does not exist" });
+
     const branchGood = defineGoodsModel(branchId);
+    const updateData = Object.fromEntries(
+      Object.entries(good).filter(([, value]) => value !== undefined)
+    );
 
-    const updateData = Object.entries({
-      name,
-      description,
-      tax,
-      price,
-      quantity,
-    }).reduce((acc, [key, value]) => {
-      if (value !== undefined) acc[key] = value; // Only add defined fields
-      return acc;
-    }, {});
-
-    if (Object.keys(updateData).length === 0) {
+    if (!Object.keys(updateData).length) {
       return res.status(400).json({ error: "No valid fields to update" });
     }
 
     const [updatedRows] = await branchGood.update(updateData, {
-      where: { itemId: itemId },
+      where: { itemId: good.itemId },
     });
 
-    if (updatedRows === 0) {
+    if (!updatedRows) {
       return res.status(404).json({ error: "No matching record found" });
     }
+
     return res.status(200).json({ message: "Update successful" });
   } catch (err) {
-    console.log("Error updating good by id: " + err.message);
+    console.error("Error updating good by id:", err.message);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

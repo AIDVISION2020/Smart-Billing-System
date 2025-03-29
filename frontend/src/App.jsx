@@ -2,6 +2,7 @@ import "./App.css";
 import LandingPage from "./pages/LandingPage";
 import PageNotFound from "./pages/PageNotFound";
 import Login from "./pages/Login";
+import ManageUsers from "./pages/ManageUsers";
 
 import { Toaster } from "react-hot-toast";
 import { Route, Routes, Navigate } from "react-router-dom";
@@ -20,6 +21,18 @@ function App() {
         <Route
           path="/login"
           element={authUser ? <Navigate to="/" /> : <Login />}
+        />
+        <Route
+          path="/manage-users"
+          element={
+            !authUser ? (
+              <Navigate to="/login" />
+            ) : authUser.role !== "admin" ? (
+              <Navigate to="/" />
+            ) : (
+              <ManageUsers />
+            )
+          }
         />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

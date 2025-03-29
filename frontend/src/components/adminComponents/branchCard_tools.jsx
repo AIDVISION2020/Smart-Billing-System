@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
-import ConfirmModal from "../modals/confirmModal";
 import UpdateBranchModal from "../modals/UpdateBranchModal";
 import useDeleteBranch from "../../hooks/useDeleteBranch";
 import { useState, useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import ConfirmModal from "../modals/ConfirmModal";
 
 const BranchCardTools_Admin = ({
   branchId,

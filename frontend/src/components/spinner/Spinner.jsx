@@ -8,7 +8,7 @@ const Spinner = ({
 }) => {
   return (
     <div
-      className={`flex inset-0 space-x-2 justify-center items-center w-full h-full ${extraStyles}`}
+      className={`flex inset-0 space-x-2 justify-center items-center w-full h-full ${extraStyles} `}
     >
       {loadingMessage ? (
         <div

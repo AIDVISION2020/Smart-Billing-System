@@ -41,7 +41,7 @@ const Dropdown = ({
           isDropdownOpen ? "block" : "hidden"
         } absolute text-base list-none bg-gray-300 divide-y rounded-xl shadow px-1 top-20 border-4 border-gray-800`}
       >
-        <ul className="py-2" aria-labelledby="dropdownButton">
+        <ul className="py-2 space-y-1" aria-labelledby="dropdownButton">
           {dropDownElements.map((element, index) => {
             return <li key={index}>{element}</li>;
           })}

@@ -14,6 +14,10 @@ export const APIEndpoints = Object.freeze({
   DELETEGOODS: "/api/goods/deleteGoods",
   MODIFYGOOD: "/api/goods/modifyGood",
   ADDGOODS: "/api/goods/addGoods",
+  GETUSERSBYBRANCHID: "/api/auth/getUsersByBranchId",
+  DELETEUSERBYID: "/api/auth/deleteUserById",
+  CREATEUSER: "/api/auth/createUser",
+  UPDATEUSER: "/api/auth/updateUser",
 });
 
 export const HomepageNavigations = Object.freeze([
