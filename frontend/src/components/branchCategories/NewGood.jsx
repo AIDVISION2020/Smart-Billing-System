@@ -2,14 +2,14 @@ import propTypes from "prop-types";
 import { useState } from "react";
 import { Check, Plus } from "lucide-react";
 
-const NewGood = ({ newGoods, setNewGoods }) => {
+const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
   const [newGood, setNewGood] = useState({
     name: "",
     description: "",
     price: 0,
     quantity: 0,
     tax: 0,
-    category: "",
+    category: selectedCategory.name,
   });
   const [addGoodErrors, setAddGoodErrors] = useState({
     name: "",
@@ -21,7 +21,6 @@ const NewGood = ({ newGoods, setNewGoods }) => {
     if (!newGood.name.trim()) newErrors.name = "Item name is required!";
     if (!newGood.description.trim())
       newErrors.description = "Description cannot be empty!";
-    if (!newGood.category.trim()) newErrors.category = "Category is required!";
     if (newGood.quantity < 1)
       newErrors.quantity = "Quantity cannot be less than 1!";
     if (!Number.isInteger(Number(newGood.quantity)))
@@ -45,36 +44,39 @@ const NewGood = ({ newGoods, setNewGoods }) => {
         price: 0,
         quantity: 0,
         tax: 0,
-        category: "",
+        category: selectedCategory.name,
       }));
   };
 
   return (
     <div className="w-full flex flex-col">
-      <div className="w-full text-center mt-10 mb-6 font-bold text-xl sm:text-2xl uppercase flex items-center justify-center">
-        <Plus size={30} strokeWidth={3} className="inline-block" />
-        <span>Add goods</span>
+      <div className="w-full flex justify-center mt-12 mb-8">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg flex items-center gap-4 text-xl sm:text-3xl font-extrabold uppercase">
+          <Plus size={36} strokeWidth={2.5} className="text-white" />
+          <span className="flex flex-wrap items-center gap-2">
+            Add Goods To
+            <span className="text-yellow-300 underline decoration-2 decoration-dotted">
+              {selectedCategory.name}
+            </span>
+          </span>
+        </div>
       </div>
+
       <div className="relative overflow-x-auto shadow-lg rounded-lg">
         <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300">
           <thead className="text-sm uppercase bg-gray-200 dark:bg-gray-900 dark:text-gray-400 font-bold">
             <tr>
-              {[
-                "Item Name",
-                "Description",
-                "Category",
-                "Price",
-                "Quantity",
-                "Tax (%)",
-              ].map((header) => (
-                <th
-                  key={header}
-                  scope="col"
-                  className="px-6 py-4 tracking-wide"
-                >
-                  {header}
-                </th>
-              ))}
+              {["Item Name", "Description", "Price", "Quantity", "Tax (%)"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    scope="col"
+                    className="px-6 py-4 tracking-wide"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody>
@@ -91,7 +93,6 @@ const NewGood = ({ newGoods, setNewGoods }) => {
                   {good.name}
                 </td>
                 <td className="px-6 py-4 font-semibold">{good.description}</td>
-                <td className="px-6 py-4 font-semibold">{good.category}</td>
                 <td className="px-6 py-4 font-semibold text-green-600 dark:text-green-400">
                   ₹{good.price}
                 </td>
@@ -152,29 +153,7 @@ const NewGood = ({ newGoods, setNewGoods }) => {
                   </p>
                 )}
               </td>
-              <td className="px-6 py-4">
-                <input
-                  type="text"
-                  placeholder="Item Category"
-                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
-                    addGoodErrors.category
-                      ? "border-red-500 focus:ring-red-400"
-                      : "border-gray-200 focus:ring-blue-400"
-                  }`}
-                  value={newGood.category}
-                  required={true}
-                  min={3}
-                  max={50}
-                  onChange={(e) =>
-                    setNewGood({ ...newGood, category: e.target.value })
-                  }
-                />
-                {addGoodErrors.category && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {addGoodErrors.category}
-                  </p>
-                )}
-              </td>
+
               <td className="px-6 py-4">
                 <input
                   type="number"
@@ -246,7 +225,6 @@ const NewGood = ({ newGoods, setNewGoods }) => {
                   className={`px-4 py-2 rounded-lg transition-all ${
                     newGood.name.trim() &&
                     newGood.description.trim() &&
-                    newGood.category.trim() &&
                     newGood.quantity > 0 &&
                     newGood.price > 0 &&
                     newGood.tax >= 0 &&
@@ -271,6 +249,7 @@ const NewGood = ({ newGoods, setNewGoods }) => {
 NewGood.propTypes = {
   newGoods: propTypes.array.isRequired,
   setNewGoods: propTypes.func.isRequired,
+  selectedCategory: propTypes.object.isRequired,
 };
 
 export default NewGood;

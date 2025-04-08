@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const CategoryAccordion = ({
   included,
-  setIncluded,
+  changeSelection,
   category,
   setDeleteCategoriesSelection,
   showCheckbox,
@@ -36,7 +36,7 @@ ${
           <div className="flex flex-grow justify-start">
             <div
               className="flex items-center gap-3 cursor-pointer"
-              onClick={() => setIncluded(category)}
+              onClick={() => changeSelection(category)}
             >
               <ListCollapse
                 size={24}
@@ -57,7 +57,7 @@ ${
       ? "bg-blue-500 text-white dark:bg-blue-400 dark:text-black shadow-md"
       : "bg-gray-700 text-gray-300 dark:bg-gray-300 dark:text-gray-700 hover:bg-gray-600 dark:hover:bg-gray-400"
   }`}
-              onClick={() => setIncluded(category)}
+              onClick={() => changeSelection(category)}
             >
               {included ? "Selected" : "Select"}
             </div>
@@ -83,7 +83,7 @@ ${
 
 CategoryAccordion.propTypes = {
   included: PropTypes.bool.isRequired,
-  setIncluded: PropTypes.func.isRequired,
+  changeSelection: PropTypes.func.isRequired,
   category: PropTypes.object.isRequired,
   setDeleteCategoriesSelection: PropTypes.func.isRequired,
   showCheckbox: PropTypes.bool.isRequired,

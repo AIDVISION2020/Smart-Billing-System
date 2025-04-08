@@ -1,13 +1,16 @@
 import propTypes from "prop-types";
 import UpdateGoodModal from "../modals/UpdateGoodModal";
-import { useState } from "react";
-import { Pencil } from "lucide-react";
+import ConfirmModal from "../modals/ConfirmModal";
+import { useState, useEffect } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import useDeleteGoods from "../../hooks/useDeleteGoods";
 
 const GoodsTable = ({
   goods,
   showEditGoodOption,
   setGoodListChangedCnt,
   branchId,
+  setCategoryListChangedCnt,
   categoryName,
 }) => {
   const findLastUpdate = (lastUpdate) => {
@@ -21,8 +24,40 @@ const GoodsTable = ({
     });
     return formattedDate;
   };
+  const { deleteGoods } = useDeleteGoods();
   const [openUpdGoodModal, setOpenUpdGoodModal] = useState(false);
+  const [deleteResponse, setDeleteResponse] = useState(false);
   const [currGood, setCurrGood] = useState({});
+
+  const confirmMessage = `Are you sure you want to delete this good?`;
+  const yesMessage = "Delete";
+  const noMessage = "Cancel";
+  const toggalModalMessage = <Trash2 size={24} color={"red"} />;
+
+  useEffect(() => {
+    const deleteGood = async () => {
+      await deleteGoods({
+        branchId,
+        itemIds: [currGood.itemId],
+      });
+      setDeleteResponse(false);
+      goods.length > 1
+        ? setGoodListChangedCnt((prev) => prev + 1)
+        : setCategoryListChangedCnt((prev) => prev + 1);
+    };
+
+    if (deleteResponse) {
+      deleteGood();
+    }
+  }, [
+    deleteResponse,
+    deleteGoods,
+    branchId,
+    currGood,
+    setGoodListChangedCnt,
+    setCategoryListChangedCnt,
+    goods.length,
+  ]);
 
   return (
     <>
@@ -50,7 +85,7 @@ const GoodsTable = ({
             </tr>
           </thead>
           <tbody>
-            {goods.map((good, index) => (
+            {goods?.map((good, index) => (
               <tr
                 key={good.itemId}
                 className={`border-b dark:border-gray-700 ${
@@ -81,15 +116,30 @@ const GoodsTable = ({
                   {findLastUpdate(good.updatedAt)}
                 </td>
                 {showEditGoodOption && (
-                  <td className="px-6 py-4 font-semibold hove">
-                    <Pencil
-                      size={20}
-                      className="text-blue-600 cursor-pointer"
-                      onClick={() => {
-                        setOpenUpdGoodModal(true), setCurrGood(good);
-                      }}
-                    />
-                  </td>
+                  <>
+                    <td className="px-6 py-4 font-semibold hove">
+                      <Pencil
+                        size={20}
+                        className="text-blue-600 cursor-pointer"
+                        onClick={() => {
+                          setOpenUpdGoodModal(true), setCurrGood(good);
+                        }}
+                      />
+                    </td>
+                    <td className="px-6 py-4 font-semibold">
+                      <div
+                        onClick={() => setCurrGood(good)} // Set the item before opening the modal
+                      >
+                        <ConfirmModal
+                          confirmMessage={confirmMessage}
+                          yesMessage={yesMessage}
+                          noMessage={noMessage}
+                          toggalModalMessage={toggalModalMessage}
+                          setResponse={setDeleteResponse}
+                        />
+                      </div>
+                    </td>
+                  </>
                 )}
               </tr>
             ))}
@@ -115,6 +165,7 @@ GoodsTable.propTypes = {
   showEditGoodOption: propTypes.func.isRequired,
   setGoodListChangedCnt: propTypes.func.isRequired,
   branchId: propTypes.string.isRequired,
+  setCategoryListChangedCnt: propTypes.func.isRequired,
   categoryName: propTypes.string.isRequired,
 };
 

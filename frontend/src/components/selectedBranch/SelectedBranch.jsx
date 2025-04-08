@@ -12,11 +12,13 @@ const SelectedBranch = ({ selectedBranch }) => {
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setIsFetched(false);
+      setCategories([]);
       const fetchedCategories = await getCategories(selectedBranch);
       setCategories(fetchedCategories);
       setIsFetched(true);
     };
-    fetchCategories();
+    if (selectedBranch) fetchCategories();
   }, [selectedBranch, getCategories, categoryListChangedCnt]);
 
   return (

@@ -18,6 +18,7 @@ export const APIEndpoints = Object.freeze({
   DELETEUSERBYID: "/api/auth/deleteUserById",
   CREATEUSER: "/api/auth/createUser",
   UPDATEUSER: "/api/auth/updateUser",
+  ADDCATEGORY: "/api/goods/addCategory",
 });
 
 export const HomepageNavigations = Object.freeze([

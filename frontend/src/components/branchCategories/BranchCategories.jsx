@@ -6,6 +6,7 @@ import { Trash2, Plus } from "lucide-react";
 import NewGood from "./NewGood";
 import useDeleteCategoriesByCategoryIds from "../../hooks/useDeleteCategoriesByCategoryIds";
 import useAddNewGoods from "../../hooks/useAddNewGoods";
+import NewCategory from "./NewCategory";
 
 const BranchCategories = ({
   categories,
@@ -111,6 +112,8 @@ const BranchCategories = ({
     </>
   );
 
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   return (
     <>
       {!categories.length ? (
@@ -128,9 +131,12 @@ const BranchCategories = ({
           {categories.map((category) => {
             return (
               <IndividualBranchCategory
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
                 category={category}
                 branchId={branchId}
                 key={category.categoryId}
+                setCategoryListChangedCnt={setCategoryListChangedCnt}
                 setDeleteCategoriesSelection={setDeleteCategoriesSelection}
                 showCheckbox={newGoods.length === 0}
                 showEditGoodOption={
@@ -150,10 +156,10 @@ const BranchCategories = ({
           toggalModalMessage={toggalModalMessage_Delete}
           setResponse={setDeleteResponse}
         />
-      ) : (
+      ) : selectedCategory ? (
         <>
           <NewGood
-            branchId={branchId}
+            selectedCategory={selectedCategory}
             setNewGoods={setNewGoods}
             newGoods={newGoods}
           />
@@ -167,6 +173,11 @@ const BranchCategories = ({
             />
           )}
         </>
+      ) : (
+        <NewCategory
+          branchId={branchId}
+          setCategoryListChangedCnt={setCategoryListChangedCnt}
+        />
       )}
     </>
   );

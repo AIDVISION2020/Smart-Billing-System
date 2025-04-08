@@ -32,10 +32,9 @@ export const getGoodByCategoryNames = async (req, res) => {
       where: whereCondition,
     });
 
-    if (!allGoods || allGoods.length === 0) {
-      return res.status(404).json({
-        error: "No goods found for the specified categories",
-        categories: category,
+    if (!allGoods) {
+      return res.status(500).json({
+        error: "Failed to fetch goods",
       });
     }
 
@@ -46,10 +45,48 @@ export const getGoodByCategoryNames = async (req, res) => {
   }
 };
 
+export const addNewCategory = async (req, res) => {
+  try {
+    const { branchId, category } = req.body;
+    if (!branchId) {
+      return res.status(400).json({ error: "Branch ID not provided" });
+    }
+    if (!(await Branch.findOne({ where: { branchId } }))) {
+      return res.status(400).json({
+        error: "This branch does not exist",
+      });
+    }
+
+    if (!category) {
+      return res.status(400).json({ error: "Category not provided" });
+    }
+
+    const branchCategory = defineCategoryModel(branchId);
+    const categoryExists = await branchCategory.findOne({
+      where: { name: category },
+    });
+
+    if (categoryExists) {
+      return res.status(400).json({
+        error: "Category already exists",
+      });
+    }
+
+    const newCategory = await branchCategory.create({ name: category });
+    return res.status(200).json({
+      message: "Category created successfully",
+      category: newCategory,
+    });
+  } catch (error) {
+    console.log("Error creating category: " + error.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const addNewGoods = async (req, res) => {
   try {
     const { goods: allGoods, branchId } = req.body;
-    // console.log("allGoods", allGoods);
+
     if (!branchId) {
       return res.status(400).json({ error: "Branch ID not provided" });
     }
@@ -62,7 +99,7 @@ export const addNewGoods = async (req, res) => {
     const branchCategory = defineCategoryModel(branchId);
     const branchGood = defineGoodsModel(branchId);
     const goods = getFullGoods(allGoods);
-    console.log("goods", goods);
+
     if (goods.length === 0) {
       return res.status(400).json({ error: "No goods provided" });
     }
@@ -155,15 +192,58 @@ export const deleteGoodsByItemIds = async (req, res) => {
       return res.status(400).json({ error: "This branch does not exist" });
 
     const branchGood = defineGoodsModel(branchId);
+    const branchCategory = defineCategoryModel(branchId);
+
+    const categories = await branchGood.findAll({
+      attributes: ["categoryId"],
+      where: {
+        itemId: { [Op.in]: itemIds },
+      },
+      group: ["categoryId"], // Ensure unique category IDs
+      raw: true,
+    });
+
+    const categoryIds = categories.map((cat) => cat.categoryId);
+
     const deletedRows = await branchGood.destroy({
       where: {
         itemId: { [Op.in]: itemIds },
       },
     });
-    const resMsg =
+
+    const categoriesToDelete = await branchGood.findAll({
+      attributes: ["categoryId"],
+      where: {
+        categoryId: { [Op.in]: categoryIds },
+      },
+      group: ["categoryId"],
+      raw: true,
+    });
+
+    const remainingCategoryIds = categoriesToDelete.map(
+      (cat) => cat.categoryId
+    );
+    // Find the categories that are now empty
+    const emptyCategoryIds = categoryIds.filter(
+      (catId) => !remainingCategoryIds.includes(catId)
+    );
+
+    let resMsg =
       deletedRows === 0
         ? "Nothing to delete"
         : ` ${deletedRows} good deleted succesfully`;
+
+    // Delete empty categories
+    if (emptyCategoryIds.length > 0) {
+      await branchCategory.destroy({
+        where: {
+          categoryId: { [Op.in]: emptyCategoryIds },
+        },
+      });
+
+      resMsg += `, and ${emptyCategoryIds.length} category(ies) deleted since they had no items`;
+    }
+
     return res.status(200).json({ message: resMsg });
   } catch (err) {
     console.log("Error deleting good by item id: " + err.message);
@@ -209,7 +289,6 @@ const getFullGoods = (goods) => {
 };
 
 const isGoodValid = (good) => {
-  console.log("good", good);
   if (!good) return false;
   const { name, price, description, quantity, tax, category } = good;
   if (

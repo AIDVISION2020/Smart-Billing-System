@@ -58,7 +58,7 @@ const ManageUsers = () => {
                 accessibleBranches?.length ? "block" : "hidden"
               } mb-8 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-gray-400 text-white dark:text-black shadow-md`}
             >
-              Accessible Branches
+              Manage Users
             </h2>
             <div className="flex flex-col gap-4 max-h-full p-2 px-8 my-16 ">
               {accessibleBranches.map((branch) => (
