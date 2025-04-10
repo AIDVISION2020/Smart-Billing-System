@@ -32,7 +32,7 @@ const Navbar = ({ dropDownElements = [] }) => {
               : "bg-blue-500 text-white"
           }`}
         >
-          {authUser?.role === Roles.ADMIN ? Roles.ADMIN : Roles.BRANCHADMIN}
+          {authUser?.role}
         </span>
         <div className="w-12 h-12 rounded-full border-4 border-black flex items-center justify-center cursor-pointer">
           <Dropdown

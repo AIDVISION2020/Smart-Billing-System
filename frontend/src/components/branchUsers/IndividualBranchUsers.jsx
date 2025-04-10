@@ -1,5 +1,5 @@
 import propTypes from "prop-types";
-import BranchAccordion from "../accordion/BranchAccordion";
+import ManageUsers_BranchAccordion from "../accordion/ManageUsers_BranchAccordion";
 import UsersTable from "../table/UsersTable";
 import { useState, useEffect } from "react";
 import useGetUsersByBranchId from "@/hooks/useGetUsersByBranchId";
@@ -27,7 +27,7 @@ const IndividualBranchUsers = ({ branch, allBranches }) => {
 
   return (
     <div>
-      <BranchAccordion
+      <ManageUsers_BranchAccordion
         included={included}
         setIncluded={() => setIncluded(!included)}
         branch={branch}

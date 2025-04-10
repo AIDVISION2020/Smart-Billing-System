@@ -1,15 +1,17 @@
 import PropTypes from "prop-types";
-import { ListCollapse, UserPlus } from "lucide-react";
+import { ListCollapse, Plus } from "lucide-react";
 import NewUserModal from "../modals/NewUserModal";
 import { Roles } from "../../constants/constants";
 import { useState } from "react";
-const BranchAccordion = ({
+const ManageUsers_BranchAccordion = ({
   included,
   setIncluded,
   branch,
   setUsersListUpdCnt,
 }) => {
-  const [openNewUserModal, setOpenNewUserModal] = useState(false);
+  const [openNewBranchManagerModal, setOpenNewBranchManagerModal] =
+    useState(false);
+  const [openNewBillerModal, setopenNewBillerModal] = useState(false);
   return (
     <>
       <div
@@ -37,28 +39,47 @@ ${
               </h2>
             </div>
           </div>
-          <div className="flex justify-evenly items-center gap-x-4">
+          <div className="flex justify-evenly items-center gap-x-2">
             {included && (
               <>
-                <UserPlus
-                  size={40}
-                  className="text-white dark:text-green-400 
-             bg-gradient-to-r from-blue-500 to-green-400 
-             p-2 rounded-full shadow-lg 
-             hover:scale-110 transition-transform duration-300 cursor-pointer"
-                  strokeWidth={3}
-                  onClick={() => setOpenNewUserModal(true)}
-                />
-                {openNewUserModal && (
+                <button
+                  className="flex items-center gap-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-md hover:scale-105 hover:brightness-110 transition-all duration-200 font-semibold text-sm sm:text-base"
+                  onClick={() => setOpenNewBranchManagerModal(true)}
+                >
+                  <Plus size={18} />
+                  {branch.branchId !== "0" ? "BranchAdmin" : "Admin"}
+                </button>
+
+                {openNewBranchManagerModal && (
                   <NewUserModal
-                    showModal={openNewUserModal}
-                    setShowModal={setOpenNewUserModal}
+                    showModal={openNewBranchManagerModal}
+                    setShowModal={setOpenNewBranchManagerModal}
                     branchId={branch.branchId}
                     setUsersListUpdCnt={setUsersListUpdCnt}
                     role={
                       branch.branchId === "0" ? Roles.ADMIN : Roles.BRANCHADMIN
                     }
                   />
+                )}
+                {branch.branchId !== "0" && (
+                  <>
+                    <button
+                      className="flex items-center gap-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-md hover:scale-105 hover:brightness-110 transition-all duration-200 font-semibold text-sm sm:text-base"
+                      onClick={() => setopenNewBillerModal(true)}
+                    >
+                      <Plus size={18} />
+                      Biller
+                    </button>
+                    {openNewBillerModal && (
+                      <NewUserModal
+                        showModal={openNewBillerModal}
+                        setShowModal={setopenNewBillerModal}
+                        branchId={branch.branchId}
+                        setUsersListUpdCnt={setUsersListUpdCnt}
+                        role={Roles.BILLER}
+                      />
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -80,11 +101,11 @@ ${
   );
 };
 
-BranchAccordion.propTypes = {
+ManageUsers_BranchAccordion.propTypes = {
   included: PropTypes.bool.isRequired,
   setIncluded: PropTypes.func.isRequired,
   branch: PropTypes.object.isRequired,
   setUsersListUpdCnt: PropTypes.func.isRequired,
 };
 
-export default BranchAccordion;
+export default ManageUsers_BranchAccordion;

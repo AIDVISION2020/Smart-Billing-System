@@ -123,7 +123,7 @@ const UsersTable = ({
                       />
                     </td>
                     <td className="px-6 py-4 font-semibold hove">
-                      {/* Delete branch */}
+                      {/* Delete user */}
                       <div onClick={() => setCurrUser(user)}>
                         <ConfirmModal
                           confirmMessage={confirmMessage}

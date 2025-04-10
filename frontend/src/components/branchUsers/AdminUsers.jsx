@@ -1,4 +1,4 @@
-import BranchAccordion from "../accordion/BranchAccordion";
+import BranchAccordion from "../accordion/ManageUsers_BranchAccordion";
 import { useState, useEffect } from "react";
 import useGetUsersByBranchId from "@/hooks/useGetUsersByBranchId";
 import Spinner from "../spinner/Spinner";
