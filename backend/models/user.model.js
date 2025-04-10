@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db/connect.db.js";
 import bcryptjs from "bcryptjs";
+import { Roles } from "../utils/constants.js";
 
 const User = sequelize.define(
   "User",
@@ -50,8 +51,7 @@ const User = sequelize.define(
       type: DataTypes.STRING,
     },
     role: {
-      type: DataTypes.ENUM("admin", "user"),
-      defaultValue: "user",
+      type: DataTypes.ENUM(Roles.ADMIN, Roles.BRANCHADMIN, Roles.BILLER),
     },
   },
   {

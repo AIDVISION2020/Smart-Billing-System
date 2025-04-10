@@ -3,6 +3,7 @@ import useCreateUser from "../../hooks/useCreateUser";
 import Spinner from "@/components/spinner/Spinner";
 import { X as Close, UserPlus, Eye, EyeOff, XCircle } from "lucide-react";
 import PropTypes from "prop-types";
+import { Roles } from "../../constants/constants";
 
 const NewUserModal = ({
   showModal,
@@ -100,7 +101,7 @@ const NewUserModal = ({
                 </span>
                 <span
                   className={`text-gray-800 dark:text-gray-400 font-semibold px-4 py-1 ${
-                    role === "admin" ? "bg-red-500" : "bg-blue-500"
+                    role === Roles.ADMIN ? "bg-red-500" : "bg-blue-500"
                   } rounded-full`}
                 >
                   {role}
@@ -264,7 +265,8 @@ NewUserModal.propTypes = {
   setShowModal: PropTypes.func.isRequired,
   setUsersListUpdCnt: PropTypes.func.isRequired,
   branchId: PropTypes.string.isRequired,
-  role: PropTypes.oneOf(["admin", "user"]).isRequired,
+  role: PropTypes.oneOf([Roles.ADMIN, Roles.BRANCHADMIN, Roles.BILLER])
+    .isRequired,
 };
 
 export default NewUserModal;

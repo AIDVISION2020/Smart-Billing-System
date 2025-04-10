@@ -3,7 +3,7 @@ import defineCategoryModel from "../models/category.model.js";
 import defineGoodsModel from "../models/good.models.js";
 import sequelize from "../db/connect.db.js";
 import { Op } from "sequelize";
-
+import { Roles } from "../utils/constants.js";
 export const addNewBranchController = async (req, res) => {
   try {
     const { branchId, location } = req.body;
@@ -124,7 +124,8 @@ export const getAccessibleBranchesController = async (req, res) => {
 
     const accessibleBranches = (
       await Branch.findAll({
-        where: role !== "admin" ? { branchId } : { branchId: { [Op.ne]: "0" } },
+        where:
+          role !== Roles.ADMIN ? { branchId } : { branchId: { [Op.ne]: "0" } },
         attributes: ["branchId", "location"],
       })
     ).map((branch) => ({

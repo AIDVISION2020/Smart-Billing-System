@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import { Roles } from "../utils/constants.js";
 
 const checkAdmin = async (req, res, next) => {
   try {
@@ -19,7 +20,7 @@ const checkAdmin = async (req, res, next) => {
       attributes: ["role"],
     });
 
-    if (user?.role !== "admin")
+    if (user?.role !== Roles.ADMIN)
       return res
         .status(403)
         .json({ error: "Forbidden - Admin access required" });

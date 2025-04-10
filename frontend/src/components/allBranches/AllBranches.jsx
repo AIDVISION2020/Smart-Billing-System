@@ -3,6 +3,7 @@ import BranchCard from "../cards/branchCard";
 import useGetAccessibleBranches from "../../hooks/useGetAccessibleBranches";
 import { useState, useEffect } from "react";
 import propTypes from "prop-types";
+import { Roles } from "../../constants/constants";
 import Spinner from "../spinner/Spinner";
 
 const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
@@ -75,7 +76,7 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
                 ))}
 
                 {/* Admin: Add New Branch Card */}
-                {userRole === "admin" && !selectedBranch && (
+                {userRole === Roles.ADMIN && !selectedBranch && (
                   <NewBranchCard
                     setBranchListUpdCount={setBranchListUpdCount}
                   />

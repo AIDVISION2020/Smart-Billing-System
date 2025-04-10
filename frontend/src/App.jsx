@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import PageNotFound from "./pages/PageNotFound";
 import Login from "./pages/Login";
 import ManageUsers from "./pages/ManageUsers";
-
+import { Roles } from "./constants/constants";
 import { Toaster } from "react-hot-toast";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useAuthContext } from "./context/authContext";
@@ -27,7 +27,7 @@ function App() {
           element={
             !authUser ? (
               <Navigate to="/login" />
-            ) : authUser.role !== "admin" ? (
+            ) : authUser.role !== Roles.ADMIN ? (
               <Navigate to="/" />
             ) : (
               <ManageUsers />

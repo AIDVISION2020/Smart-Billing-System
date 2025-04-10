@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import { Roles } from "../utils/constants.js";
 import bcryptjs from "bcryptjs";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
@@ -21,14 +22,14 @@ export const createUserController = async (req, res) => {
       !password ||
       !confirmPassword ||
       !role ||
-      (role === "user" && !branchId)
+      (role !== Roles.ADMIN && !branchId)
     )
       return res.status(400).json({ error: "Insufficient user data" });
 
     if (password !== confirmPassword)
       return res.status(400).json({ error: "Passwords do not match" });
 
-    if (role === "user") {
+    if (role !== Roles.ADMIN) {
       if (!(await Branch.findOne({ where: { branchId } }))) {
         return res.status(400).json({
           error: "This branch does not exist",
@@ -41,8 +42,8 @@ export const createUserController = async (req, res) => {
       name,
       email,
       password,
-      branchId: role === "admin" ? "0" : branchId,
-      role: role ? role : "user",
+      branchId: role === Roles.ADMIN ? "0" : branchId,
+      role,
     });
 
     return res.status(200).json({ message: "User created successfully" });
@@ -142,7 +143,7 @@ export const deleteUserByIdController = async (req, res) => {
     });
     if (!user)
       return res.status(404).json({ error: "No user found with this ID" });
-    if (user.role === "admin")
+    if (user.role === Roles.ADMIN)
       return res.status(403).json({ error: "Cannot delete admin" });
     const deletedUser = await User.destroy({
       where: {
@@ -167,7 +168,7 @@ export const updateUserByIdController = async (req, res) => {
     const updateData = Object.fromEntries(
       Object.entries(updatedUser).filter(([, value]) => value !== undefined)
     );
-    if (updateData.role === "admin") updateData.branchId = "0";
+    if (updateData.role === Roles.ADMIN) updateData.branchId = "0";
     if (!Object.keys(updateData).length) {
       return res.status(400).json({ error: "No valid fields to update" });
     }

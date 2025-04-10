@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { ListCollapse, UserPlus } from "lucide-react";
 import NewUserModal from "../modals/NewUserModal";
+import { Roles } from "../../constants/constants";
 import { useState } from "react";
 const BranchAccordion = ({
   included,
@@ -54,7 +55,9 @@ ${
                     setShowModal={setOpenNewUserModal}
                     branchId={branch.branchId}
                     setUsersListUpdCnt={setUsersListUpdCnt}
-                    role={branch.branchId === "0" ? "admin" : "user"}
+                    role={
+                      branch.branchId === "0" ? Roles.ADMIN : Roles.BRANCHADMIN
+                    }
                   />
                 )}
               </>

@@ -4,6 +4,7 @@ import SelectedBranch from "../components/selectedBranch/SelectedBranch.jsx";
 import { useState } from "react";
 import Navbar from "../components/navbar/Navbar.jsx";
 import { Link } from "react-router-dom";
+import { Roles } from "../constants/constants.js";
 
 const LandingPage = () => {
   const { authUser } = useAuthContext();
@@ -22,7 +23,7 @@ const LandingPage = () => {
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <Navbar
         dropDownElements={[
-          authUser?.role === "admin" ? navigateToManagerUsers : null,
+          authUser?.role === Roles.ADMIN ? navigateToManagerUsers : null,
         ]}
       />
       <AllBranches

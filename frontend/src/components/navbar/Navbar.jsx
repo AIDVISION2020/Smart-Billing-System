@@ -1,6 +1,6 @@
 import Dropdown from "../dropdown/Dropdown";
 import { User } from "lucide-react";
-import { AppNameFull } from "../../constants/constants";
+import { AppNameFull, Roles } from "../../constants/constants";
 import { useAuthContext } from "@/context/authContext";
 import Logout from "../logout/Logout";
 import PropTypes from "prop-types";
@@ -27,12 +27,12 @@ const Navbar = ({ dropDownElements = [] }) => {
       <div className="flex items-center gap-x-4">
         <span
           className={`px-3 py-1 text-sm sm:text-lg font-medium rounded-full ${
-            authUser?.role === "admin"
+            authUser?.role === Roles.ADMIN
               ? "bg-red-500 text-white"
               : "bg-blue-500 text-white"
           }`}
         >
-          {authUser?.role === "admin" ? "Admin" : "User"}
+          {authUser?.role === Roles.ADMIN ? Roles.ADMIN : Roles.BRANCHADMIN}
         </span>
         <div className="w-12 h-12 rounded-full border-4 border-black flex items-center justify-center cursor-pointer">
           <Dropdown

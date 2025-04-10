@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import UpdateUserModal from "../modals/UpdateUserModal";
 import useDeleteUser from "../../hooks/useDeleteUser";
 import ConfirmModal from "../modals/ConfirmModal";
+import { Roles } from "../../constants/constants";
 import { useAuthContext } from "../../context/AuthContext";
 
 const UsersTable = ({
@@ -97,7 +98,7 @@ const UsersTable = ({
                 <td className="px-6 py-4 font-semibold text-white">
                   <span
                     className={`px-4 py-2 rounded-full ${
-                      user.role === "admin" ? "bg-red-500" : "bg-blue-500"
+                      user.role === Roles.ADMIN ? "bg-red-500" : "bg-blue-500"
                     }`}
                   >
                     {user.role}

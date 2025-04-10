@@ -21,6 +21,12 @@ export const APIEndpoints = Object.freeze({
   ADDCATEGORY: "/api/goods/addCategory",
 });
 
+export const Roles = Object.freeze({
+  ADMIN: "admin",
+  BRANCHADMIN: "branchAdmin",
+  BILLER: "biller",
+});
+
 export const HomepageNavigations = Object.freeze([
   {
     name: "Login",

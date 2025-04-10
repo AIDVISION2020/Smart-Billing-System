@@ -3,6 +3,7 @@ import useUpdateUser from "@/hooks/useUpdateUser";
 import Spinner from "@/components/spinner/Spinner";
 import { X as Close, Save, Replace, ChevronDown } from "lucide-react";
 import propTypes from "prop-types";
+import { Roles } from "../../constants/constants";
 
 const UpdateUserModal = ({
   showModal,
@@ -215,18 +216,21 @@ const UpdateUserModal = ({
               onClick={() =>
                 setUpdatedUser((prev) => ({
                   ...prev,
-                  role: prev.role === "user" ? "admin" : "user",
+                  role:
+                    prev.role === Roles.BRANCHADMIN
+                      ? Roles.ADMIN
+                      : Roles.BRANCHADMIN,
                 }))
               }
               className={`px-4 py-2 mt-4 text-md font-semibold text-white rounded-xl shadow-md transition-all 
     ${
-      updatedUser.role === "user"
+      updatedUser.role === Roles.BRANCHADMIN
         ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300"
         : "bg-red-600 hover:bg-red-700 focus:ring-red-300"
     }
   `}
             >
-              {updatedUser.role === "user"
+              {updatedUser.role === Roles.BRANCHADMIN
                 ? "Promote to Admin"
                 : "Demote to User"}
             </button>
