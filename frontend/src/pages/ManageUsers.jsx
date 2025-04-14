@@ -1,21 +1,12 @@
 import Navbar from "../components/navbar/Navbar";
-import { Link } from "react-router-dom";
 import useGetAccessibleBranches from "../hooks/useGetAccessibleBranches";
 import IndividualBranchUsers from "../components/branchUsers/IndividualBranchUsers";
 import AdminUsers from "../components/branchUsers/AdminUsers";
 import { useState, useEffect } from "react";
 import Spinner from "../components/spinner/Spinner";
+import { PagesLink } from "../constants/constants";
 
 const ManageUsers = () => {
-  const navigateToLandingPage = (
-    <Link
-      to="/"
-      className="text-center block px-4 py-2 text-white bg-blue-600 shadow-md hover:bg-blue-700 transition-all duration-300 dark:bg-gray-800 dark:hover:bg-gray-700"
-    >
-      Home
-    </Link>
-  );
-
   const { loading, getAccessibleBranches } = useGetAccessibleBranches();
   const [accessibleBranches, setAccessibleBranches] = useState([]);
   const [networkReq, setNetworkReq] = useState(false);
@@ -31,7 +22,7 @@ const ManageUsers = () => {
 
   return (
     <>
-      <Navbar dropDownElements={[navigateToLandingPage]} />
+      <Navbar currentPageName={PagesLink.MANAGE_USERS.name} />
       <div
         className="min-h-screen p-3 sm:p-8
     flex flex-col text-white dark:text-black bg-gray-300 dark:bg-gray-100 border-y-4 border-black transition-all duration-300 ease-in-out 

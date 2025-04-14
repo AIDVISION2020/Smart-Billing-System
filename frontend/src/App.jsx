@@ -1,5 +1,7 @@
 import "./App.css";
 import LandingPage from "./pages/LandingPage";
+import ManageGoods from "./pages/ManageGoods";
+import Billing from "./pages/Billing";
 import PageNotFound from "./pages/PageNotFound";
 import Login from "./pages/Login";
 import ManageUsers from "./pages/ManageUsers";
@@ -10,13 +12,25 @@ import { useAuthContext } from "./context/authContext";
 
 function App() {
   const { authUser } = useAuthContext();
-
+  const userRole = authUser?.role;
   return (
     <>
       <Routes>
         <Route
           path="/"
-          element={authUser ? <LandingPage /> : <Navigate to="/login" />}
+          element={
+            authUser ? (
+              userRole === Roles.ADMIN ? (
+                <LandingPage />
+              ) : userRole === Roles.BRANCHADMIN ? (
+                <Navigate to="/manage-goods" />
+              ) : (
+                <Navigate to="/billing" />
+              )
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route
           path="/login"
@@ -27,10 +41,34 @@ function App() {
           element={
             !authUser ? (
               <Navigate to="/login" />
-            ) : authUser.role !== Roles.ADMIN ? (
+            ) : userRole !== Roles.ADMIN ? (
               <Navigate to="/" />
             ) : (
               <ManageUsers />
+            )
+          }
+        />
+        <Route
+          path="/manage-goods"
+          element={
+            !authUser ? (
+              <Navigate to="/login" />
+            ) : userRole === Roles.BILLER ? (
+              <Navigate to="/billing" />
+            ) : (
+              <ManageGoods />
+            )
+          }
+        />
+        <Route
+          path="/billing"
+          element={
+            !authUser ? (
+              <Navigate to="/login" />
+            ) : userRole === Roles.BRANCHADMIN ? (
+              <Navigate to="/manage-goods" />
+            ) : (
+              <Billing />
             )
           }
         />

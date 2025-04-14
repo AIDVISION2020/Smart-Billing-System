@@ -32,11 +32,30 @@ export const HomepageNavigations = Object.freeze([
     name: "Login",
     link: "/login",
   },
-  {
-    name: "Register",
-    link: "/signup",
-  },
 ]);
+
+export const PagesLink = Object.freeze({
+  LANDING: {
+    link: "/",
+    name: "Home",
+  },
+  LOGIN: {
+    link: "/login",
+    name: "Login",
+  },
+  MANAGE_USERS: {
+    link: "/manage-users",
+    name: "Manage Users",
+  },
+  MANAGE_GOODS: {
+    link: "/manage-goods",
+    name: "Manage Goods",
+  },
+  BILLING: {
+    link: "/billing",
+    name: "Billing",
+  },
+});
 
 export const AppNameAcronym = "SBS";
 export const AppNameFull = "Smart Billing System";

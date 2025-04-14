@@ -1,12 +1,56 @@
 import Dropdown from "../dropdown/Dropdown";
 import { User } from "lucide-react";
-import { AppNameFull, Roles } from "../../constants/constants";
+import { AppNameFull, Roles, PagesLink } from "../../constants/constants";
 import { useAuthContext } from "@/context/authContext";
 import Logout from "../logout/Logout";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-const Navbar = ({ dropDownElements = [] }) => {
+const Navbar = ({
+  dropDownElements = [],
+  disableDefaultNavigations = false,
+  currentPageName = null,
+}) => {
   const { authUser } = useAuthContext();
+
+  const generateNavItem = (page) => {
+    const isActive = currentPageName === page.name;
+    const commonClasses =
+      "text-center block px-4 py-2 text-white shadow-md transition-all duration-300";
+    const activeClasses = "bg-green-600 cursor-not-allowed";
+    const defaultClasses =
+      "bg-blue-600 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700";
+
+    if (isActive) {
+      return (
+        <div key={page.name} className={`${commonClasses} ${activeClasses}`}>
+          {page.name}
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        key={page.name}
+        to={page.link}
+        className={`${commonClasses} ${defaultClasses}`}
+      >
+        {page.name}
+      </Link>
+    );
+  };
+
+  const navigations = disableDefaultNavigations
+    ? dropDownElements
+    : authUser?.role === Roles.ADMIN
+    ? [
+        generateNavItem(PagesLink.LANDING),
+        generateNavItem(PagesLink.MANAGE_USERS),
+        generateNavItem(PagesLink.MANAGE_GOODS),
+        generateNavItem(PagesLink.BILLING),
+        ...dropDownElements,
+      ]
+    : [null];
 
   dropDownElements = [
     <div
@@ -15,7 +59,7 @@ const Navbar = ({ dropDownElements = [] }) => {
     >
       {authUser?.username}
     </div>,
-    ...dropDownElements,
+    ...navigations,
     <Logout key="logout-button" />,
   ];
 
@@ -47,7 +91,8 @@ const Navbar = ({ dropDownElements = [] }) => {
 
 Navbar.propTypes = {
   dropDownElements: PropTypes.array,
-  navbarLinks: PropTypes.array,
+  disableDefaultNavigations: PropTypes.bool,
+  currentPageName: PropTypes.string,
 };
 
 export default Navbar;
