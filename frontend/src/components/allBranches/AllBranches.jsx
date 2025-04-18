@@ -59,9 +59,9 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
               </div>
             ) : (
               <div
-                className={`flex ${
+                className={`flex overflow-x-auto no-scrollbar w-full gap-4 sm:gap-8 px-2 justify-evenly ${
                   !selectedBranch && "flex-wrap"
-                } items-center justify-center w-[90%] gap-4 sm:gap-8`}
+                }`}
               >
                 {/* Render Branch Cards */}
                 {accessibleBranches?.map((branch) => (
@@ -74,14 +74,11 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
                     selectedBranch={selectedBranch}
                   />
                 ))}
-
-                {/* Admin: Add New Branch Card */}
-                {userRole === Roles.ADMIN && !selectedBranch && (
-                  <NewBranchCard
-                    setBranchListUpdCount={setBranchListUpdCount}
-                  />
-                )}
               </div>
+            )}
+            {/* Admin: Add New Branch Card */}
+            {userRole === Roles.ADMIN && !selectedBranch && (
+              <NewBranchCard setBranchListUpdCount={setBranchListUpdCount} />
             )}
           </>
         )}

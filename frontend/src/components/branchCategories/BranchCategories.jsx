@@ -2,7 +2,7 @@ import propTypes from "prop-types";
 import IndividualBranchCategory from "./IndividualBranchCategory";
 import { useEffect, useState } from "react";
 import ConfirmModal from "../modals/confirmModal";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Search } from "lucide-react";
 import NewGood from "./NewGood";
 import useDeleteCategoriesByCategoryIds from "../../hooks/useDeleteCategoriesByCategoryIds";
 import useAddNewGoods from "../../hooks/useAddNewGoods";
@@ -113,6 +113,21 @@ const BranchCategories = ({
   );
 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [filterQuery, setFilterQuery] = useState("");
+
+  const [filteredCategories, setFilteredCategories] = useState(categories);
+
+  useEffect(() => {
+    const filteredResult = categories.filter((category) => {
+      const { categoryId, name } = category;
+      return (
+        categoryId.toLowerCase().includes(filterQuery.toLowerCase()) ||
+        name.toLowerCase().includes(filterQuery.toLowerCase())
+      );
+    });
+    setFilteredCategories(filteredResult);
+    // setCategories(filteredCategories);
+  }, [filterQuery, categories]);
 
   return (
     <>
@@ -128,7 +143,27 @@ const BranchCategories = ({
         </div>
       ) : (
         <>
-          {categories.map((category) => {
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400 dark:text-gray-300" />
+            </span>
+            <input
+              type="text"
+              placeholder="Enter categoryId or category name..."
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
+            />
+            {filterQuery && (
+              <button
+                onClick={() => setFilterQuery("")}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {filteredCategories.map((category) => {
             return (
               <IndividualBranchCategory
                 selectedCategory={selectedCategory}

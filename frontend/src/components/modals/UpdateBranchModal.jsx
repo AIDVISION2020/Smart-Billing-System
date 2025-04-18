@@ -12,8 +12,8 @@ const UpdateBranchModal = ({
   currLocation,
 }) => {
   const [updatedBranch, setUpdatedBranch] = useState({
-    branchId: "",
-    location: "",
+    branchId: currBranchId,
+    location: currLocation,
   });
 
   const { loading, updateBranch } = useUpdateBranch();
@@ -88,7 +88,7 @@ const UpdateBranchModal = ({
                 </label>
                 <Replace
                   size={20}
-                  className="ml-4 text-blue-600 pointer"
+                  className="ml-4 text-blue-600 cursor-pointer"
                   onClick={() => {
                     setUpdatedBranch({
                       ...updatedBranch,
@@ -122,7 +122,7 @@ const UpdateBranchModal = ({
                 </label>
                 <Replace
                   size={20}
-                  className="ml-4 text-blue-600 pointer"
+                  className="ml-4 text-blue-600 cursor-pointer"
                   onClick={() => {
                     setUpdatedBranch({
                       ...updatedBranch,

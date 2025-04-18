@@ -8,8 +8,11 @@ import {
   ShoppingCart,
   HandCoins,
   AlertTriangle,
+  ReceiptText,
 } from "lucide-react";
+import { PagesLink } from "../../constants/constants";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -20,11 +23,11 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
           bill.billName.split("_").slice(1).join("_").replace(/_/g, ":")
         ).toLocaleString();
   };
-  const lastUpdated = converDate(bill.timestamp);
-
-  const handleDeletion = async (billName) => {
+  const lastUpdatedAt = converDate(bill.lastUpdatedAt);
+  const createdAt = converDate(bill.createdAt);
+  const handleDeletion = async (billId) => {
     try {
-      await deleteBill(billName);
+      await deleteBill(billId);
       toast.success("Bill deleted successfully!");
       setShowDeleteConfirm(false);
       setUpdatedBillListCnt((prev) => prev + 1);
@@ -76,14 +79,18 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
               </span>
               ?
             </p>
+
+            <p className="text-xs text-black dark:text-gray-200">
+              Created at: <span className="font-medium">{createdAt}</span>
+            </p>
             <p className="text-xs text-black dark:text-gray-200">
               Last updated at:{" "}
-              <span className="font-medium">{lastUpdated}</span>
+              <span className="font-medium">{lastUpdatedAt}</span>
             </p>
 
             <div className="flex flex-col gap-2 mt-3">
               <button
-                onClick={() => handleDeletion(bill.billName)}
+                onClick={() => handleDeletion(bill.billId)}
                 className="bg-white dark:bg-gray-200 text-red-600 font-bold py-2 px-4 rounded-xl shadow hover:bg-gray-100 transition-colors"
               >
                 Confirm Delete
@@ -105,45 +112,66 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
           <span className="font-extrabold capitalize sm:text-xl">
             {bill.billName || "Unknown bill"}
           </span>
-          <div className="space-y-3 mb-4 flex flex-col items-center">
-            <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
-              <ShoppingCart
-                size={18}
-                className="mr-2 text-blue-500 dark:text-blue-400"
-              />
-              <span className="mr-1">Items:</span>
-              <span className="font-semibold text-gray-900 dark:text-white">
-                {bill.items.length}
-              </span>
-            </div>
+          {bill.items.length === 0 ? (
+            <>
+              <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 flex-col">
+                <ReceiptText
+                  size={60}
+                  className="mr-2 text-red-500 dark:text-red-400"
+                />
+                <span className="mr-1">No items added</span>
+                <span className="font-semibold text-red-500 dark:text-red-400">
+                  Add items to the bill
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3 mb-4 flex flex-col items-center">
+              <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                <ShoppingCart
+                  size={18}
+                  className="mr-2 text-blue-500 dark:text-blue-400"
+                />
+                <span className="mr-1">Items:</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {bill.items.length}
+                </span>
+              </div>
 
-            <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
-              <HandCoins
-                size={18}
-                className="mr-2 text-green-600 dark:text-green-400"
-              />
-              <span className="mr-1">Amount:</span>
-              <span className="font-semibold text-green-600 dark:text-green-400">
-                ₹{bill.totalAmount}
-              </span>
-            </div>
+              <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                <HandCoins
+                  size={18}
+                  className="mr-2 text-green-600 dark:text-green-400"
+                />
+                <span className="mr-1">Amount:</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">
+                  ₹{bill.totalAmount}
+                </span>
+              </div>
 
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Last Updated:{" "}
-              <span className="font-medium text-gray-800 dark:text-white">
-                {lastUpdated}
-              </span>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Created At:{" "}
+                <span className="font-medium text-gray-800 dark:text-white">
+                  {createdAt}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Last Updated:{" "}
+                <span className="font-medium text-gray-800 dark:text-white">
+                  {lastUpdatedAt}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
+
           <div className="flex w-full justify-between items-center pt-2 border-t border-gray-300 dark:border-gray-700">
-            <button
+            <Link
+              to={`${PagesLink.BILLING_TABLE.link}/${bill.billId}`}
               className="text-sm font-semibold px-5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 flex items-center"
-              onClick={() => {
-                console.log("Editing:", bill.billName);
-              }}
             >
-              <Pencil size={16} className="mr-2" /> Edit Bill
-            </button>
+              <Pencil size={20} className="mr-1" />
+              Edit
+            </Link>
 
             <button
               className="text-red-500 hover:text-red-600 transition-transform hover:scale-110 flex items-center"
