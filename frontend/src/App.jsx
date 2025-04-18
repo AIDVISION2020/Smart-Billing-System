@@ -5,6 +5,7 @@ import Billing from "./pages/Billing";
 import PageNotFound from "./pages/PageNotFound";
 import Login from "./pages/Login";
 import ManageUsers from "./pages/ManageUsers";
+import BillTable from "./pages/BillTable";
 import { Roles } from "./constants/constants";
 import { Toaster } from "react-hot-toast";
 import { Route, Routes, Navigate } from "react-router-dom";
@@ -72,6 +73,19 @@ function App() {
             )
           }
         />
+        <Route
+          path="/billing/:billId"
+          element={
+            !authUser ? (
+              <Navigate to="/login" />
+            ) : userRole === Roles.BRANCHADMIN ? (
+              <Navigate to="/manage-goods" />
+            ) : (
+              <BillTable />
+            )
+          }
+        />
+
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Toaster />

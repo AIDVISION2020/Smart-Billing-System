@@ -151,14 +151,7 @@ export const getAllCategoriesFromBranchId = async (req, res) => {
       return res.status(400).json({ error: "This branch does not exist" });
 
     const branchCategory = defineCategoryModel(branchId);
-    const allCategories = (
-      await branchCategory.findAll({
-        attributes: ["categoryId", "name"],
-      })
-    ).map((category) => ({
-      categoryId: category.categoryId,
-      name: category.name,
-    }));
+    const allCategories = await branchCategory.findAll({ raw: true });
 
     return res.status(200).json({
       allCategories,

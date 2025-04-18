@@ -7,6 +7,15 @@ const defineCategoryModel = (branchId) => {
   return sequelize.define(
     "Category",
     {
+      branchId: {
+        references: {
+          model: "branches", // Reference to the branches table
+          key: "branchId",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+        type: DataTypes.STRING,
+      },
       categoryId: {
         type: DataTypes.STRING,
         defaultValue: () =>
@@ -17,6 +26,10 @@ const defineCategoryModel = (branchId) => {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
+      },
+      imageUrl: {
+        type: DataTypes.STRING,
+        defaultValue: null,
       },
     },
     {

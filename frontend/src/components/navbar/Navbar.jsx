@@ -65,9 +65,12 @@ const Navbar = ({
 
   return (
     <nav className="flex items-center justify-between sm:px-6 py-4 border-b border-gray-300 dark:border-gray-700">
-      <h1 className="text-center font-bold sm:font-extrabold text-xl sm:text-2xl md:text-4xl lg:text-6xl flex-grow">
+      <Link
+        to={PagesLink.LANDING.link}
+        className="text-center font-bold sm:font-extrabold text-xl sm:text-2xl md:text-4xl lg:text-6xl flex-grow"
+      >
         {AppNameFull}
-      </h1>
+      </Link>
       <div className="flex items-center gap-x-4">
         <span
           className={`px-3 py-1 text-sm sm:text-lg font-medium rounded-full ${

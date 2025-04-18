@@ -72,7 +72,11 @@ export const addNewCategory = async (req, res) => {
       });
     }
 
-    const newCategory = await branchCategory.create({ name: category });
+    const newCategory = await branchCategory.create({
+      name: category,
+      branchId,
+    });
+
     return res.status(200).json({
       message: "Category created successfully",
       category: newCategory,
@@ -143,6 +147,43 @@ export const addNewGoods = async (req, res) => {
       .json({ message: `${validGoods.length} goods created successfully` });
   } catch (error) {
     console.error("Error creating good:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const modifyCategoryById = async (req, res) => {
+  try {
+    const { category } = req.body;
+
+    if (!category?.categoryId)
+      return res.status(400).json({ error: "Category ID is required" });
+    const { branchId } = category;
+    if (!branchId)
+      return res.status(400).json({ error: "Branch ID is required" });
+    const branchExists = await Branch.count({ where: { branchId } });
+    if (!branchExists)
+      return res.status(400).json({ error: "This branch does not exist" });
+
+    const branchCategory = defineCategoryModel(branchId);
+
+    const updateData = Object.fromEntries(
+      Object.entries(category).filter(([, value]) => value !== undefined)
+    );
+    if (!Object.keys(updateData).length) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+
+    const [updatedRows] = await branchCategory.update(updateData, {
+      where: { categoryId: category.categoryId },
+    });
+
+    if (!updatedRows) {
+      return res.status(404).json({ error: "No matching record found" });
+    }
+
+    return res.status(200).json({ message: "Category updated successful" });
+  } catch (err) {
+    console.error("Error updating category by id:", err.message);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -274,6 +315,74 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
     return res.status(200).json({ message: resMsg });
   } catch (err) {
     console.log("Error deleting categories by ids: " + err.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getCategoriesByQuery = async (req, res) => {
+  try {
+    const { branchId, query } = req.body;
+
+    if (!branchId) return res.status(400).json({ error: "BranchId not found" });
+    if (!(await Branch.findOne({ where: { branchId } })))
+      return res.status(400).json({ error: "This branch does not exist" });
+
+    const branchCategory = defineCategoryModel(branchId);
+    const categories = await branchCategory.findAll({
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: `%${query}%`,
+            },
+          },
+          {
+            categoryId: {
+              [Op.like]: `%${query}%`,
+            },
+          },
+        ],
+      },
+    });
+
+    return res.status(200).json({ searchResults: categories });
+  } catch (err) {
+    console.log("Error getting categories by query: " + err.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getGoodsByQuery = async (req, res) => {
+  try {
+    const { branchId, categoryId, query } = req.body;
+    if (!branchId) return res.status(400).json({ error: "BranchId not found" });
+    if (!(await Branch.findOne({ where: { branchId } })))
+      return res.status(400).json({ error: "This branch does not exist" });
+    if (!categoryId)
+      return res.status(400).json({ error: "CategoryId not found" });
+
+    const branchGood = defineGoodsModel(branchId);
+    const goods = await branchGood.findAll({
+      where: {
+        categoryId,
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: `%${query}%`,
+            },
+          },
+          {
+            itemId: {
+              [Op.like]: `%${query}%`,
+            },
+          },
+        ],
+      },
+    });
+
+    return res.status(200).json({ searchResults: goods });
+  } catch (err) {
+    console.log("Error getting goods by query: " + err.message);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

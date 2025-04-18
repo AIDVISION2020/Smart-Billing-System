@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { ListCollapse } from "lucide-react";
 import { useState, useEffect } from "react";
+import UpdateCategoryModal from "../modals/UpdateCategoryModal";
 
 const CategoryAccordion = ({
   included,
@@ -8,8 +9,10 @@ const CategoryAccordion = ({
   category,
   setDeleteCategoriesSelection,
   showCheckbox,
+  setCategoryListChangedCnt,
 }) => {
   const [checked, setChecked] = useState(false);
+  const [editCategory, setEditCategory] = useState(false);
 
   useEffect(() => {
     setDeleteCategoriesSelection((prev) => {
@@ -44,14 +47,25 @@ ${
                   included ? "text-gray-400 dark:text-gray-600" : ""
                 } `}
               />
+              <h2 className="text-sm sm:text-md font-medium hidden sm:block ">
+                {category.categoryId}
+              </h2>
               <h2 className="text-lg sm:text-xl font-medium">
                 {category.name}
               </h2>
             </div>
           </div>
-          <div className="flex justify-evenly items-center gap-x-4">
+          <div className="flex justify-evenly items-center gap-x-1 sm:gap-x-4">
+            {included && (
+              <button
+                className="px-4 py-1 rounded-lg text-xs sm:text-base font-semibold transition-all duration-300 cursor-pointer bg-blue-500 text-white dark:bg-blue-400 dark:text-black shadow-md"
+                onClick={() => setEditCategory(true)}
+              >
+                Edit
+              </button>
+            )}
             <div
-              className={`px-4 py-1 rounded-lg text-sm sm:text-base font-semibold transition-all duration-300 cursor-pointer
+              className={`px-4 py-1 rounded-lg text-xs sm:text-base font-semibold transition-all duration-300 cursor-pointer
   ${
     included
       ? "bg-blue-500 text-white dark:bg-blue-400 dark:text-black shadow-md"
@@ -77,6 +91,13 @@ ${
           </div>
         </div>
       </div>
+      {editCategory && (
+        <UpdateCategoryModal
+          setShowModal={setEditCategory}
+          currCategory={category}
+          setCategoryListChangedCnt={setCategoryListChangedCnt}
+        />
+      )}
     </>
   );
 };
@@ -87,6 +108,7 @@ CategoryAccordion.propTypes = {
   category: PropTypes.object.isRequired,
   setDeleteCategoriesSelection: PropTypes.func.isRequired,
   showCheckbox: PropTypes.bool.isRequired,
+  setCategoryListChangedCnt: PropTypes.func.isRequired,
 };
 
 export default CategoryAccordion;

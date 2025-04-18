@@ -2,7 +2,7 @@ let db;
 
 const DB_NAME = "SmartBillingSystemDB";
 const STORE_NAME = "UnfinishedBills";
-const KEY_PATH = "billName";
+const KEY_PATH = "billId";
 
 export const checkIfIndexedDBSupported = () => {
   return typeof window !== "undefined" && !!window.indexedDB;
@@ -30,26 +30,14 @@ export const openDatabase = () => {
   });
 };
 
-export const saveCurrentBill = (
-  bill = {
-    customerName: "customer_2025-04-14_18-30-05", // must be unique
-    billName: "Bill12",
-    items: [
-      { name: "Item A", quantity: 2, price: 100 },
-      { name: "Item B", quantity: 1, price: 50 },
-    ],
-    totalAmount: 250,
-    timestamp: Date.now(), // optional, helps track when it was last updated
-  }
-) => {
+export const saveCurrentBill = (bill) => {
+  const currTime = Date.now();
+  if (!bill.createdAt) bill.createdAt = currTime;
+  bill.lastUpdatedAt = currTime;
   return new Promise((resolve, reject) => {
     if (!db)
       return reject("Database not initialized. Call openDatabase first.");
-    if (!bill || !bill.billName || !bill.items || !bill.totalAmount) {
-      return reject(
-        "Invalid bill: billName, items, and totalAmount are required."
-      );
-    }
+    if (!bill) return reject("Bill is required and should be an object.");
 
     const tx = db.transaction([STORE_NAME], "readwrite");
     const store = tx.objectStore(STORE_NAME);
@@ -61,36 +49,59 @@ export const saveCurrentBill = (
   });
 };
 
-export const getUnfinishedBills = (billName = "") => {
+export const getUnfinishedBills = ({ billId, createdBy }) => {
   return new Promise((resolve, reject) => {
     if (!db)
       return reject("Database not initialized. Call openDatabase first.");
+
     const tx = db.transaction([STORE_NAME], "readonly");
     const store = tx.objectStore(STORE_NAME);
 
-    const request = billName ? store.get(billName) : store.getAll();
+    if (billId) {
+      // If billId is provided, get the specific bill
+      const request = store.get(billId);
 
-    request.onsuccess = (event) => {
-      const result = event.target.result;
-      resolve(result || (billName ? null : []));
-    };
+      request.onsuccess = (event) => {
+        const result = event.target.result;
+        if (result && (!createdBy || result.createdBy === createdBy)) {
+          resolve(result);
+        } else {
+          resolve(null);
+        }
+      };
 
-    request.onerror = (event) => {
-      reject(`Error retrieving bill(s): ${event.target.errorCode}`);
-    };
+      request.onerror = (event) => {
+        reject(`Error retrieving bill: ${event.target.errorCode}`);
+      };
+    } else {
+      // Get all bills and filter based on createdBy if provided
+      const request = store.getAll();
+
+      request.onsuccess = (event) => {
+        let bills = event.target.result || [];
+        if (createdBy) {
+          bills = bills.filter((bill) => bill.createdBy === createdBy);
+        }
+        resolve(bills);
+      };
+
+      request.onerror = (event) => {
+        reject(`Error retrieving bills: ${event.target.errorCode}`);
+      };
+    }
   });
 };
 
-export const deleteBill = (billName) => {
+export const deleteBill = (billId) => {
   return new Promise((resolve, reject) => {
     if (!db)
       return reject("Database not initialized. Call openDatabase first.");
-    if (!billName)
-      return reject("billName is required to delete a specific bill.");
+    if (!billId || typeof billId !== "string")
+      return reject("billId is required and should be a string.");
 
     const tx = db.transaction([STORE_NAME], "readwrite");
     const store = tx.objectStore(STORE_NAME);
-    const request = store.delete(billName);
+    const request = store.delete(billId);
 
     request.onsuccess = () => resolve("Bill deleted successfully.");
     request.onerror = (event) =>
@@ -105,5 +116,29 @@ export const deleteIndexedDb = () => {
     request.onsuccess = () => resolve("Database deleted successfully.");
     request.onerror = (event) =>
       reject(`Error deleting database: ${event.target.errorCode}`);
+  });
+};
+
+export const checkBillExists = (billId) => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      return reject("Database not initialized. Call openDatabase first.");
+    }
+    if (!billId || typeof billId !== "string") {
+      return reject("billId is required and should be a string.");
+    }
+
+    const tx = db.transaction([STORE_NAME], "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.get(billId);
+
+    request.onsuccess = (event) => {
+      const result = event.target.result;
+      resolve(result); // Resolves with bill object if bill exists, false otherwise
+    };
+
+    request.onerror = (event) => {
+      reject(`Error checking bill existence: ${event.target.errorCode}`);
+    };
   });
 };

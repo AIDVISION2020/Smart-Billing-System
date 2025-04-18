@@ -13,12 +13,15 @@ export const APIEndpoints = Object.freeze({
   DELETECATEGORIES: "/api/goods/deleteCategories",
   DELETEGOODS: "/api/goods/deleteGoods",
   MODIFYGOOD: "/api/goods/modifyGood",
+  MODIFYCATEGORY: "/api/goods/modifyCategory",
   ADDGOODS: "/api/goods/addGoods",
   GETUSERSBYBRANCHID: "/api/auth/getUsersByBranchId",
   DELETEUSERBYID: "/api/auth/deleteUserById",
   CREATEUSER: "/api/auth/createUser",
   UPDATEUSER: "/api/auth/updateUser",
   ADDCATEGORY: "/api/goods/addCategory",
+  GETCATEGORIESBYQUERY: "/api/goods/getCategoriesByQuery",
+  GETGOODSBYQUERY: "/api/goods/getGoodsByQuery",
 });
 
 export const Roles = Object.freeze({
@@ -55,6 +58,15 @@ export const PagesLink = Object.freeze({
     link: "/billing",
     name: "Billing",
   },
+  BILLING_TABLE: {
+    link: "/billing", //:billName,
+    name: "Billing Table",
+  },
+});
+
+export const Cloudinary = Object.freeze({
+  UPLOAD_PRESET: "Smart_Billing_System",
+  CLOUD_NAME: "dlqcpq76e",
 });
 
 export const AppNameAcronym = "SBS";

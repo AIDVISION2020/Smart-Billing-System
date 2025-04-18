@@ -47,6 +47,7 @@ const IndividualBranchCategory = ({
         category={category}
         setDeleteCategoriesSelection={setDeleteCategoriesSelection}
         showCheckbox={showCheckbox}
+        setCategoryListChangedCnt={setCategoryListChangedCnt}
       />
       {included && (
         <div className="mt-4 mb-8">
