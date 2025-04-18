@@ -29,7 +29,8 @@ const defineCategoryModel = (branchId) => {
       },
       imageUrl: {
         type: DataTypes.STRING,
-        defaultValue: null,
+        defaultValue:
+          "https://cdn.pixabay.com/photo/2024/06/26/23/36/package-8856091_640.png",
       },
     },
     {
