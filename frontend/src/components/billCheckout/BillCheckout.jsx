@@ -3,6 +3,7 @@ import ConfirmModal from "../modals/ConfirmModal";
 import { useState, useEffect } from "react";
 import { saveCurrentBill } from "../../indexedDB/indexedDB";
 import toast from "react-hot-toast";
+import useCreateNewBill from "../../hooks/useCreateNewBill";
 
 const BillCheckout = ({ currentBill, setCurrentBill }) => {
   const [clearBillConfirmation, setClearBillConfirmation] = useState(false);
@@ -33,6 +34,23 @@ const BillCheckout = ({ currentBill, setCurrentBill }) => {
     if (clearBillConfirmation) clearBill();
   }, [clearBillConfirmation, currentBill, setCurrentBill]);
 
+  const { loading, createBill } = useCreateNewBill();
+
+  const handleSaveBill = () => {
+    if (!currentBill.items.length) {
+      toast.error("No items in the bill to save!");
+      return;
+    }
+    const createNewBill = async () => {
+      try {
+        await createBill({ newBill: currentBill });
+      } catch (err) {
+        toast.error("Error creating bill: " + err.message);
+      }
+    };
+    createNewBill();
+  };
+
   return (
     <>
       <div className="flex flex-col items-center justify-center">
@@ -60,7 +78,11 @@ const BillCheckout = ({ currentBill, setCurrentBill }) => {
         </div>
       </div>
       <div className="flex flex-wrap justify-around px-4 items-center">
-        <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg py-2 px-4 w-auto transition duration-200 ">
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg py-2 px-4 w-auto transition duration-200"
+          onClick={handleSaveBill}
+          disabled={loading}
+        >
           Generate Bill
         </button>
         <ConfirmModal

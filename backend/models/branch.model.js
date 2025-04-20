@@ -18,6 +18,12 @@ const Branch = sequelize.define(
     categoriesTableName: {
       type: DataTypes.STRING(50),
     },
+    billTableName: {
+      type: DataTypes.STRING(50),
+    },
+    billItemTableName: {
+      type: DataTypes.STRING(50),
+    },
   },
   {
     tableName: "branches",

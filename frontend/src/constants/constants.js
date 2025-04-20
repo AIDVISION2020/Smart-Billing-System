@@ -22,6 +22,8 @@ export const APIEndpoints = Object.freeze({
   ADDCATEGORY: "/api/goods/addCategory",
   GETCATEGORIESBYQUERY: "/api/goods/getCategoriesByQuery",
   GETGOODSBYQUERY: "/api/goods/getGoodsByQuery",
+  CREATENEWBILL: "/api/billing/createNewBill",
+  FETCHBILLS: "/api/billing/fetchBill",
 });
 
 export const Roles = Object.freeze({

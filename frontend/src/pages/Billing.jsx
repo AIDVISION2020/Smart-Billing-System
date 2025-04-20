@@ -66,9 +66,9 @@ const Billing = () => {
       }
       const billId = generateBillId();
       const newBill = {
-        customerName: billId, // must be unique
+        customerName: "customer_" + billId,
         billId,
-        billName: billId,
+        billName: "bill_" + billId,
         branchId: selectedBranch,
         items: [],
         totalAmount: 0,

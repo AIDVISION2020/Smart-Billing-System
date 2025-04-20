@@ -1,9 +1,12 @@
 import Branch from "../models/branch.model.js";
 import defineCategoryModel from "../models/category.model.js";
 import defineGoodsModel from "../models/good.models.js";
+import defineBillItemModel from "../models/billItem.model.js";
+import defineBillModel from "../models/bill.model.js";
 import sequelize from "../db/connect.db.js";
 import { Op } from "sequelize";
 import { Roles } from "../utils/constants.js";
+
 export const addNewBranchController = async (req, res) => {
   try {
     const { branchId, location } = req.body;
@@ -21,13 +24,19 @@ export const addNewBranchController = async (req, res) => {
       location,
       goodsTableName: `goods_${branchId}`,
       categoriesTableName: `categories_${branchId}`,
+      billTableName: `bill_${branchId}`,
+      billItemTableName: `billItem_${branchId}`,
     });
 
     const branchCategory = defineCategoryModel(branchId);
     const branchGood = defineGoodsModel(branchId);
+    const branchBill = defineBillModel(branchId);
+    const branchBillItem = defineBillItemModel(branchId);
 
     await branchCategory.sync(); // First, create category table
     await branchGood.sync(); // Then, create goods table with FK reference
+    await branchBill.sync(); // Then, create bill table with FK reference
+    await branchBillItem.sync(); // Finally, create bill item table with FK reference
 
     return res.status(200).json({
       message: "New branch added successfully",
@@ -57,8 +66,10 @@ export const deleteBranchByIdController = async (req, res) => {
     if (deletedRows.length === 0) resMsg = "Nothing to delete";
     else {
       resMsg = `${deletedRows} branch deleted successfully`;
+      await sequelize.getQueryInterface().dropTable(`billItem_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`goods_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`categories_${branchId}`);
+      await sequelize.getQueryInterface().dropTable(`bill_${branchId}`);
     }
 
     return res.status(200).json({ message: resMsg });
