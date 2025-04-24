@@ -6,6 +6,7 @@ import PageNotFound from "./pages/PageNotFound";
 import Login from "./pages/Login";
 import ManageUsers from "./pages/ManageUsers";
 import BillTable from "./pages/BillTable";
+import Analytics from "./pages/Analytics";
 import { Roles } from "./constants/constants";
 import { Toaster } from "react-hot-toast";
 import { Route, Routes, Navigate } from "react-router-dom";
@@ -14,6 +15,7 @@ import { useAuthContext } from "./context/authContext";
 function App() {
   const { authUser } = useAuthContext();
   const userRole = authUser?.role;
+
   return (
     <>
       <Routes>
@@ -85,7 +87,18 @@ function App() {
             )
           }
         />
-
+        <Route
+          path="/analytics"
+          element={
+            !authUser ? (
+              <Navigate to="/login" />
+            ) : userRole === Roles.BILLER ? (
+              <Navigate to="/billing" />
+            ) : (
+              <Analytics />
+            )
+          }
+        />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Toaster />

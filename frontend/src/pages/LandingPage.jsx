@@ -28,7 +28,7 @@ const LandingPage = () => {
           Where would you like to go today?
         </p>
 
-        <div className="flex flex-wrap justify-center gap-6 max-w-5xl">
+        <div className="flex flex-wrap justify-center gap-6">
           {/* Card 1 */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -75,6 +75,23 @@ const LandingPage = () => {
               className="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold"
             >
               Start Billing <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          {/* Card 4 */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              View Analytics
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Explore sales trends, top-performing items, and key metrics to
+              drive smarter decisions.
+            </p>
+            <Link
+              to={PagesLink.ANALYTICS.link}
+              className="inline-flex items-center gap-1 text-pink-600 hover:underline font-semibold"
+            >
+              Go to Analytics <ArrowRight size={18} />
             </Link>
           </div>
         </div>

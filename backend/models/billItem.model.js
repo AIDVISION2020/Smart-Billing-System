@@ -35,7 +35,7 @@ const defineBillItemModel = (branchId) => {
         onDelete: "CASCADE",
       },
       priceWhenBought: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
       purchasedQuantity: {
@@ -43,7 +43,7 @@ const defineBillItemModel = (branchId) => {
         allowNull: false,
       },
       taxWhenBought: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
     },

@@ -10,18 +10,25 @@ import {
   getGoodsByQuery,
   modifyCategoryById,
 } from "../controllers/goods.controller.js";
-import protectRoute from "../middleware/protectRoute.js";
-
+import checkInventoryAuthority from "../middleware/checkInventoryAuthority.js";
 const router = express.Router();
 
-router.post("/getGoods", protectRoute, getGoodByCategoryNames);
-router.post("/addCategory", protectRoute, addNewCategory);
-router.post("/addGoods", protectRoute, addNewGoods);
-router.post("/modifyGood", protectRoute, modifyGoodByItemId);
-router.patch("/modifyCategory", protectRoute, modifyCategoryById);
-router.post("/getCategoriesByQuery", protectRoute, getCategoriesByQuery);
-router.post("/getGoodsByQuery", protectRoute, getGoodsByQuery);
-router.delete("/deleteGoods", protectRoute, deleteGoodsByItemIds);
-router.delete("/deleteCategories", protectRoute, deleteCategoriesByCategoryIds);
+router.post("/getGoods", checkInventoryAuthority, getGoodByCategoryNames);
+router.post("/addCategory", checkInventoryAuthority, addNewCategory);
+router.post("/addGoods", checkInventoryAuthority, addNewGoods);
+router.post("/modifyGood", checkInventoryAuthority, modifyGoodByItemId);
+router.patch("/modifyCategory", checkInventoryAuthority, modifyCategoryById);
+router.post(
+  "/getCategoriesByQuery",
+  checkInventoryAuthority,
+  getCategoriesByQuery
+);
+router.post("/getGoodsByQuery", checkInventoryAuthority, getGoodsByQuery);
+router.delete("/deleteGoods", checkInventoryAuthority, deleteGoodsByItemIds);
+router.delete(
+  "/deleteCategories",
+  checkInventoryAuthority,
+  deleteCategoriesByCategoryIds
+);
 
 export default router;

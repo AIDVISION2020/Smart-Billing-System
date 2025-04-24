@@ -24,6 +24,9 @@ export const APIEndpoints = Object.freeze({
   GETGOODSBYQUERY: "/api/goods/getGoodsByQuery",
   CREATENEWBILL: "/api/billing/createNewBill",
   FETCHBILLS: "/api/billing/fetchBill",
+  GETBILLSSALESSUMMARY: "/api/analytics/bill-sales-summary",
+  GETBILLITEMSSALESSUMMARY: "/api/analytics/bill-items-sales-summary",
+  GETBRANCHSUMMARY: "/api/analytics/branch-summary",
 });
 
 export const Roles = Object.freeze({
@@ -64,7 +67,34 @@ export const PagesLink = Object.freeze({
     link: "/billing", //:billName,
     name: "Billing Table",
   },
+  ANALYTICS: {
+    link: "/analytics",
+    name: "Analytics",
+  },
 });
+
+export const AnalyticsTypes = [
+  {
+    title: "Sales Summary",
+    description: "Revenue, bills, and average value at a glance.",
+  },
+  {
+    title: "Item Breakdown",
+    description: "Best & worst selling products with revenue stats.",
+  },
+  {
+    title: "Stock Insights",
+    description: "Track low, fast-moving, and stagnant inventory.",
+  },
+  {
+    title: "Tax Analysis",
+    description: "GST collected, slab-wise split, and compliance.",
+  },
+  {
+    title: "Time Trends",
+    description: "Sales patterns by hour, day, week, and month.",
+  },
+];
 
 export const Cloudinary = Object.freeze({
   UPLOAD_PRESET: "Smart_Billing_System",

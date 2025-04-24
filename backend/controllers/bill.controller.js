@@ -81,7 +81,6 @@ export const fetchBills = async (req, res) => {
     const loggedInUser = req.user?.dataValues;
 
     const { billIds = [] } = req.body;
-    console.log("loggedInUser", loggedInUser);
     const { userId } = loggedInUser;
     // If billIds array is empty then fetch all bills created by this user
     if (!userId) {

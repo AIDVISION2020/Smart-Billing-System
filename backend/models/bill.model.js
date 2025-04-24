@@ -42,19 +42,19 @@ const defineBillModel = (branchId) => {
         allowNull: false,
       },
       subTotal: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
       totalTax: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
       totalDiscount: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         defaultValue: 0,
       },
       totalAmount: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
     },

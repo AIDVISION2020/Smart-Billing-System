@@ -10,6 +10,7 @@ import goodsRoutes from "./routes/goods.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import branchRoutes from "./routes/branch.routes.js";
 import billingRoutes from "./routes/bill.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
 
 const __dirname = path.resolve(); // Get the current directory
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,7 @@ app.use("/api/goods", goodsRoutes); // Use the goods routes
 app.use("/api/auth", authRoutes); // Use the auth routes
 app.use("/api/branch", branchRoutes); // Use the branch routes
 app.use("/api/billing", billingRoutes); // Use the billing routes
+app.use("/api/analytics", analyticsRoutes); // Use the analytics routes
 
 app.use(express.static(path.join(__dirname, "/frontend/dist"))); // Serve the static files
 app.get("*", (req, res) => {
