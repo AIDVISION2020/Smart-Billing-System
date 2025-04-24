@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import useGetStockSummary from "../../../hooks/useGetStockSummary";
 import toast from "react-hot-toast";
 import Spinner from "../../Spinner/Spinner";
-import AnalysisDatePicker from "../AnalysisDatePicker";
 import { ChevronDown } from "lucide-react";
 import useGetAccessibleBranches from "../../../hooks/useGetAccessibleBranches";
 import PieChatCard from "../PieChartCard";
@@ -77,20 +76,11 @@ const StockInsights = () => {
         />
       ) : (
         <div className="flex flex-col items-center justify-center ">
-          <h2 className="text-2xl sm:text-4xl font-extrabold mb-6 text-gray-800">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-800">
             Stock Overview
           </h2>
 
-          <AnalysisDatePicker
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-            onRefresh={fetchStockSummary}
-            loading={loading}
-          />
-
-          <div className="w-full flex flex-col items-center justify-center rounded-lg my-6 py-6 sm:px-4">
+          <div className="w-full flex flex-col items-center justify-center rounded-lg mb-6 py-2 sm:px-4">
             <div className="flex items-center w-full sm:w-[250px] gap-2 justify-center bg-gray-300 py-2 px-4 rounded-2xl">
               <label
                 htmlFor="branchID"
