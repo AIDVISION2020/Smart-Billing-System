@@ -339,5 +339,204 @@ const getCategorySummary = async (branchId, startDate, endDate, billItems) => {
     throw new Error("Internal server error");
   }
 };
-
 // BRANCH SUMMARY END
+
+// STOCK SUMMARY BEGIN
+// export const getStockSummary = async (req, res) => {
+//   try {
+//     const { branchId, startDate, endDate } = req.body;
+//     await checkValidBranch(branchId);
+//     checkValidDates(startDate, endDate);
+
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+//     end.setHours(23, 59, 59, 999);
+
+//     const { BillItem } = initBillModels(branchId);
+//     const Goods = defineGoodsModel(branchId);
+
+//     const billItems = await BillItem.findAll({
+//       where: {
+//         createdAt: {
+//           [Op.between]: [start, end],
+//         },
+//       },
+//     });
+
+//     const itemIds = [...new Set(billItems.map((item) => item.itemId))];
+
+//     const goods = await Goods.findAll({
+//       where: {
+//         itemId: {
+//           [Op.in]: itemIds,
+//         },
+//       },
+//     });
+
+//     // Aggregate item-level stats
+//     const itemSalesMap = new Map();
+
+//     for (const item of billItems) {
+//       const { itemId, quantity, price, taxAmount } = item;
+
+//       if (!itemSalesMap.has(itemId)) {
+//         itemSalesMap.set(itemId, {
+//           itemId,
+//           totalItemsSold: 0,
+//           totalSales: 0,
+//           totalTax: 0,
+//         });
+//       }
+
+//       const current = itemSalesMap.get(itemId);
+
+//       current.totalItemsSold += Number(quantity);
+//       current.totalSales += Number(price);
+//       current.totalTax += Number(taxAmount);
+
+//       itemSalesMap.set(itemId, current);
+//     }
+
+//     const enrichedItems = goods.map((item) => {
+//       const stats = itemSalesMap.get(item.itemId) || {
+//         totalItemsSold: 0,
+//         totalSales: 0,
+//         totalTax: 0,
+//       };
+
+//       return {
+//         itemId: item.itemId,
+//         name: item.name,
+//         categoryId: item.categoryId,
+//         stock: Number(item.quantity), // typecast for safety
+//         ...stats,
+//       };
+//     });
+
+//     return res.json({ data: enrichedItems });
+//   } catch (error) {
+//     console.error("Error getting Stock summary:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
+// Label items based on stock thresholds
+const getItemLabel = (stock, lowThreshold = 10, overstockThreshold = 100) => {
+  if (stock <= lowThreshold) return "low-stock";
+  if (stock >= overstockThreshold) return "overstocked";
+  return "normal";
+};
+
+/**
+ * Attach label and categoryName to each item
+ */
+const getItemDetails = (goods, categoryNameMap) => {
+  return goods.map((g) => {
+    const stock = Number(g.quantity || 0);
+    const label = getItemLabel(stock);
+    return {
+      itemId: g.itemId,
+      name: g.name,
+      categoryId: g.categoryId,
+      categoryName: categoryNameMap[g.categoryId] || "Unknown Category",
+      stock,
+      unitPrice: Number(g.price || 0),
+      label,
+    };
+  });
+};
+
+/**
+ * Compute stock valuation for each item synchronously
+ */
+const getStockValuation = (items) =>
+  items.map((item) => ({
+    ...item,
+    stockValue: Number(item.unitPrice) * Number(item.stock),
+  }));
+
+/**
+ * Aggregate items by category for stock breakdown
+ */
+const getCategoryBreakdown = (items) => {
+  const map = {};
+
+  items.forEach((item) => {
+    const { categoryId, categoryName, stock, stockValue } = item;
+    if (!map[categoryId]) {
+      map[categoryId] = {
+        categoryId,
+        categoryName,
+        totalStock: 0,
+        uniqueItemCount: 0,
+        lowStockCount: 0,
+        lowStocks: [],
+        stockValue: 0,
+      };
+    }
+    const cat = map[categoryId];
+    cat.totalStock += stock;
+    cat.uniqueItemCount += 1;
+    cat.stockValue += stockValue;
+    if (item.label === "low-stock") {
+      cat.lowStocks.push({ itemId: item.itemId, name: item.name, stock });
+      cat.lowStockCount += 1;
+    }
+  });
+  return Object.values(map);
+};
+
+// Main controller
+export const getStockSummary = async (req, res) => {
+  try {
+    const { branchId, startDate, endDate } = req.body;
+    await checkValidBranch(branchId);
+    checkValidDates(startDate, endDate);
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const { BillItem } = initBillModels(branchId);
+    const Goods = defineGoodsModel(branchId);
+    const Category = defineCategoryModel(branchId);
+
+    // 1. fetch all items in bills between dates
+    const billItems = await BillItem.findAll({
+      where: { createdAt: { [Op.between]: [start, end] } },
+    });
+    const itemIds = [...new Set(billItems.map((bi) => bi.itemId))];
+
+    // 2. fetch goods for those items
+    const goods = await Goods.findAll({
+      where: { itemId: { [Op.in]: itemIds } },
+    });
+
+    // 3. fetch category names
+    const categoryIds = [...new Set(goods.map((g) => g.categoryId))];
+    const categories = await Category.findAll({
+      where: { categoryId: { [Op.in]: categoryIds } },
+    });
+    const categoryNameMap = categories.reduce((acc, c) => {
+      acc[c.categoryId] = c.name;
+      return acc;
+    }, {});
+
+    // 4. build item details with labels and category names
+    const itemDetails = getItemDetails(goods, categoryNameMap);
+
+    // 5. attach valuation
+    const itemsWithValuation = getStockValuation(itemDetails);
+
+    // 6. category-level breakdown
+    const categoriesBreakdown = getCategoryBreakdown(itemsWithValuation);
+
+    return res.status(200).json({
+      items: itemsWithValuation,
+      categories: categoriesBreakdown,
+    });
+  } catch (error) {
+    console.error("Error in getStockSummary:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};

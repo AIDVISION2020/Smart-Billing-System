@@ -3,6 +3,7 @@ import {
   getBillSalesSummary,
   getBillItemsSalesSummary,
   getBranchSummary,
+  getStockSummary,
 } from "../controllers/analytics.controller.js";
 import checkInventoryAuthority from "../middleware/checkInventoryAuthority.js";
 
@@ -19,4 +20,5 @@ router.post(
   getBillItemsSalesSummary
 );
 router.post("/branch-summary", checkInventoryAuthority, getBranchSummary);
+router.post("/stock-summary", checkInventoryAuthority, getStockSummary);
 export default router;

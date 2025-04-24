@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import StatCard from "../StatCard";
-import PieChatCard from "./PieChartCard";
+import PieChatCard from "../PieChartCard";
 
 const METRICS = [
   { value: "totalSales", label: "Total Sales", isCurrency: true },

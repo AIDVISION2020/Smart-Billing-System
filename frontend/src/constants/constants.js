@@ -27,6 +27,7 @@ export const APIEndpoints = Object.freeze({
   GETBILLSSALESSUMMARY: "/api/analytics/bill-sales-summary",
   GETBILLITEMSSALESSUMMARY: "/api/analytics/bill-items-sales-summary",
   GETBRANCHSUMMARY: "/api/analytics/branch-summary",
+  GETSTOCKSUMMARY: "/api/analytics/stock-summary",
 });
 
 export const Roles = Object.freeze({
@@ -85,10 +86,6 @@ export const AnalyticsTypes = [
   {
     title: "Stock Insights",
     description: "Track low, fast-moving, and stagnant inventory.",
-  },
-  {
-    title: "Tax Analysis",
-    description: "GST collected, slab-wise split, and compliance.",
   },
   {
     title: "Time Trends",

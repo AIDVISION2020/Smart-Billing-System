@@ -19,7 +19,6 @@ import {
   Legend,
 } from "recharts";
 import Spinner from "../../Spinner/Spinner";
-import { RefreshCcw } from "lucide-react";
 import {
   handlePrint,
   getTrendsData,
@@ -27,6 +26,7 @@ import {
   exportTrendsToCSV,
 } from "./utils";
 import StatCard from "../StatCard";
+import AnalysisDatePicker from "../AnalysisDatePicker";
 
 const BAR_COLORS = ["#4F46E5", "#059669", "#F59E0B", "#EF4444", "#8B5CF6"];
 
@@ -160,38 +160,14 @@ const SalesOverview = () => {
             Sales Overview
           </h2>
 
-          <div className="flex flex-wrap gap-2 sm:gap-4 mb-2 items-center">
-            <label className="text-sm text-gray-600">
-              <input
-                type="date"
-                max={today}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border rounded px-2 py-1"
-              />
-            </label>
-            <span className="text-sm text-gray-600 font-semibold">to</span>
-            <label className="text-sm text-gray-600">
-              <input
-                type="date"
-                max={today}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border rounded px-2 py-1"
-              />
-            </label>
-            <button
-              onClick={fetchSalesSummary}
-              className={`px-2 py-1 rounded text-white ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-              disabled={loading}
-            >
-              <RefreshCcw size={20} />
-            </button>
-          </div>
+          <AnalysisDatePicker
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+            onRefresh={fetchSalesSummary}
+            loading={loading}
+          />
 
           <div className="space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

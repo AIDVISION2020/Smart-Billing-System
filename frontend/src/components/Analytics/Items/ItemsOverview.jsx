@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import Spinner from "../../Spinner/Spinner";
-import { RefreshCcw, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import useGetBranchSummary from "../../../hooks/useGetBranchSummary";
 import toast from "react-hot-toast";
-import PieChatCard from "./PieChartCard";
+import PieChatCard from "../PieChartCard";
 import BranchStats from "./BranchStats";
 import StatCard from "../StatCard";
+import AnalysisDatePicker from "../AnalysisDatePicker";
 
 const METRIC_OPTIONS = [
   { value: "totalSales", label: "Total Sales", isCurrency: true },
@@ -87,38 +88,14 @@ const ItemsOverview = () => {
           <h2 className="text-2xl sm:text-4xl font-extrabold mb-6 text-gray-800">
             Branches Overview
           </h2>
-          <div className="flex flex-wrap gap-2 sm:gap-4 mb-10 items-center">
-            <label className="text-sm text-gray-600">
-              <input
-                type="date"
-                max={today}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border rounded px-2 py-1"
-              />
-            </label>
-            <span className="text-sm text-gray-600 font-semibold">to</span>
-            <label className="text-sm text-gray-600">
-              <input
-                type="date"
-                max={today}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border rounded px-2 py-1"
-              />
-            </label>
-            <button
-              onClick={fetchBranchSummary}
-              className={`px-2 py-1 rounded text-white ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-              disabled={loading}
-            >
-              <RefreshCcw size={20} />
-            </button>
-          </div>
+          <AnalysisDatePicker
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+            onRefresh={fetchBranchSummary}
+            loading={loading}
+          />
           <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
             <PieChatCard
               data={allBranches}

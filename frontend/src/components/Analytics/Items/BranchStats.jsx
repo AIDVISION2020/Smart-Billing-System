@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import StatCard from "../StatCard";
-import PieChatCard from "./PieChartCard";
+import PieChatCard from "../PieChartCard";
 import CategoryStats from "./CategoryStats";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";

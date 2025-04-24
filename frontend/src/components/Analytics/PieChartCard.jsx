@@ -17,7 +17,16 @@ const COLORS = [
   "#ff8042",
   "#8dd1e1",
   "#d0ed57",
+  "#a4de6c",
+  "#ffc0cb",
+  "#ffb6c1",
+  "#ff69b4",
+  "#ff1493",
+  "#db7093",
+  "#c71585",
 ];
+// Randomly rotate the colors array
+const shuffledColors = COLORS.sort(() => Math.random() - 0.5);
 
 export default function PieChatCard({ data, metricOptions, title, nameKey }) {
   const [selected, setSelected] = useState(metricOptions[0]);
@@ -80,7 +89,10 @@ export default function PieChatCard({ data, metricOptions, title, nameKey }) {
               label
             >
               {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                <Cell
+                  key={i}
+                  fill={shuffledColors[i % shuffledColors.length]}
+                />
               ))}
             </Pie>
             <Tooltip
