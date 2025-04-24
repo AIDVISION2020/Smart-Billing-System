@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import useGetStockSummary from "../../../hooks/useGetStockSummary";
 import toast from "react-hot-toast";
 import Spinner from "../../Spinner/Spinner";
-import AnalysisDatePicker from "../AnalysisDatePicker";
 import { ChevronDown } from "lucide-react";
 import useGetAccessibleBranches from "../../../hooks/useGetAccessibleBranches";
 import PieChatCard from "../PieChartCard";
@@ -11,15 +10,9 @@ const StockInsights = () => {
   const { getStockSummary } = useGetStockSummary();
   const { getAccessibleBranches } = useGetAccessibleBranches();
 
-  const today = new Date().toISOString().split("T")[0];
-
   const [allBranches, setAllBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [startDate, setStartDate] = useState(
-    () => new Date(new Date().setDate(1)).toISOString().split("T")[0]
-  );
-  const [endDate, setEndDate] = useState(today);
   const [hasFetchedInitially, setHasFetchedInitially] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stockSummary, setStockSummary] = useState({
@@ -33,8 +26,6 @@ const StockInsights = () => {
     try {
       const { items, categories } = await getStockSummary({
         branchId: selectedBranch.branchId,
-        startDate,
-        endDate,
       });
 
       setStockSummary({ items, categories });
@@ -43,7 +34,7 @@ const StockInsights = () => {
     } finally {
       setLoading(false);
     }
-  }, [getStockSummary, selectedBranch, startDate, endDate]);
+  }, [getStockSummary, selectedBranch]);
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -77,20 +68,11 @@ const StockInsights = () => {
         />
       ) : (
         <div className="flex flex-col items-center justify-center ">
-          <h2 className="text-2xl sm:text-4xl font-extrabold mb-6 text-gray-800">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-800">
             Stock Overview
           </h2>
 
-          <AnalysisDatePicker
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-            onRefresh={fetchStockSummary}
-            loading={loading}
-          />
-
-          <div className="w-full flex flex-col items-center justify-center rounded-lg my-6 py-6 sm:px-4">
+          <div className="w-full flex flex-col items-center justify-center rounded-lg mb-6 py-2 sm:px-4">
             <div className="flex items-center w-full sm:w-[250px] gap-2 justify-center bg-gray-300 py-2 px-4 rounded-2xl">
               <label
                 htmlFor="branchID"

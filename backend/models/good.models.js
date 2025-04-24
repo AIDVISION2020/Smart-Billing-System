@@ -31,7 +31,7 @@ const defineGoodsModel = (branchId) => {
         type: DataTypes.STRING,
       },
       price: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
       quantity: {
@@ -39,7 +39,7 @@ const defineGoodsModel = (branchId) => {
         defaultValue: 0,
       },
       tax: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
     },

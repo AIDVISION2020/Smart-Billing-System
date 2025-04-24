@@ -447,7 +447,7 @@ const getItemDetails = (goods, categoryNameMap) => {
 };
 
 /**
- * Compute stock valuation for each item synchronously
+ * Compute stock valuation for each item
  */
 const getStockValuation = (items) =>
   items.map((item) => ({
@@ -489,30 +489,15 @@ const getCategoryBreakdown = (items) => {
 // Main controller
 export const getStockSummary = async (req, res) => {
   try {
-    const { branchId, startDate, endDate } = req.body;
+    const { branchId } = req.body;
     await checkValidBranch(branchId);
-    checkValidDates(startDate, endDate);
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
-
-    const { BillItem } = initBillModels(branchId);
     const Goods = defineGoodsModel(branchId);
     const Category = defineCategoryModel(branchId);
 
-    // 1. fetch all items in bills between dates
-    const billItems = await BillItem.findAll({
-      where: { createdAt: { [Op.between]: [start, end] } },
-    });
-    const itemIds = [...new Set(billItems.map((bi) => bi.itemId))];
+    const goods = await Goods.findAll({});
 
-    // 2. fetch goods for those items
-    const goods = await Goods.findAll({
-      where: { itemId: { [Op.in]: itemIds } },
-    });
-
-    // 3. fetch category names
+    // fetch category names
     const categoryIds = [...new Set(goods.map((g) => g.categoryId))];
     const categories = await Category.findAll({
       where: { categoryId: { [Op.in]: categoryIds } },
@@ -522,13 +507,13 @@ export const getStockSummary = async (req, res) => {
       return acc;
     }, {});
 
-    // 4. build item details with labels and category names
+    // build item details with labels and category names
     const itemDetails = getItemDetails(goods, categoryNameMap);
 
-    // 5. attach valuation
+    // attach valuation
     const itemsWithValuation = getStockValuation(itemDetails);
 
-    // 6. category-level breakdown
+    // category-level breakdown
     const categoriesBreakdown = getCategoryBreakdown(itemsWithValuation);
 
     return res.status(200).json({
