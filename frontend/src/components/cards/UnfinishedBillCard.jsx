@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 
 const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const converDate = (lastUpdate) => {
     return lastUpdate
       ? new Date(lastUpdate).toLocaleString()
@@ -23,8 +24,11 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
           bill.billName.split("_").slice(1).join("_").replace(/_/g, ":")
         ).toLocaleString();
   };
+
   const lastUpdatedAt = converDate(bill.lastUpdatedAt);
   const createdAt = converDate(bill.createdAt);
+  const isCompleted = bill.completed || false;
+
   const handleDeletion = async (billId) => {
     try {
       await deleteBill(billId);
@@ -42,7 +46,23 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
   };
 
   return (
-    <div className="relative overflow-hidden flex rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 w-full">
+    <div
+      className={`relative overflow-hidden flex rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 w-full ${
+        isCompleted ? "opacity-80" : ""
+      }`}
+    >
+      {/* Blackish film overlay when completed */}
+      {isCompleted && (
+        <div className="absolute inset-0 bg-black bg-opacity-60 z-10 pointer-events-none" />
+      )}
+
+      {/* Completed Stamp */}
+      {isCompleted && (
+        <div className="absolute top-[40%] right-[60%] translate-x-[50%] translate-y-[-50%] rotate-12 bg-green-500 text-white font-extrabold text-4xl px-6 py-1 rounded-full shadow-lg opacity-90 pointer-events-none select-none z-20">
+          Completed
+        </div>
+      )}
+
       {/* Slide-over Left Section */}
       <div
         className={`flex flex-col justify-center items-center transition-all duration-500 ease-in-out ${
@@ -67,7 +87,6 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
               size={40}
               className="text-black dark:text-red-200 mx-auto mb-2"
             />
-
             <p className="text-sm text-black dark:text-red-200 font-semibold">
               Delete bill{" "}
               <span className="underline underline-offset-2">
@@ -112,6 +131,7 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
           <span className="font-extrabold capitalize sm:text-xl">
             {bill.billName || "Unknown bill"}
           </span>
+
           {bill.items.length === 0 ? (
             <>
               <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 flex-col">
@@ -149,14 +169,21 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
                 </span>
               </div>
 
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                Created At:{" "}
-                <span className="font-medium text-gray-800 dark:text-white">
-                  {createdAt}
-                </span>
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
-                Last Updated:{" "}
+              {!isCompleted && (
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Created At:{" "}
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {createdAt}
+                  </span>
+                </div>
+              )}
+              <div
+                className={`text-xs text-gray-500 dark:text-gray-400 ${
+                  isCompleted && "pt-4"
+                }`}
+              >
+                {isCompleted ? "Completed At" : "Last updated At"}
+                {": "}
                 <span className="font-medium text-gray-800 dark:text-white">
                   {lastUpdatedAt}
                 </span>
@@ -164,24 +191,31 @@ const UnfinishedBillCard = ({ bill, setUpdatedBillListCnt }) => {
             </div>
           )}
 
-          <div className="flex w-full justify-between items-center pt-2 border-t border-gray-300 dark:border-gray-700">
-            <Link
-              to={`${PagesLink.BILLING_TABLE.link}/${bill.billId}`}
-              className="text-sm font-semibold px-5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 flex items-center"
-            >
-              <Pencil size={20} className="mr-1" />
-              Edit
-            </Link>
+          {/* Action buttons - Only show if not completed */}
+          {!isCompleted ? (
+            <div className="flex w-full justify-between items-center pt-2 border-t border-gray-300 dark:border-gray-700">
+              <Link
+                to={`${PagesLink.BILLING_TABLE.link}/${bill.billId}`}
+                className="text-sm font-semibold px-5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 flex items-center"
+              >
+                <Pencil size={20} className="mr-1" />
+                Edit
+              </Link>
 
-            <button
-              className="text-red-500 hover:text-red-600 transition-transform hover:scale-110 flex items-center"
-              onClick={() => setShowDeleteConfirm(true)}
-              title="Delete bill"
-            >
-              <Trash2 size={20} className="mr-1" />
-              <span className="sr-only">Delete</span>
-            </button>
-          </div>
+              <button
+                className="text-red-500 hover:text-red-600 transition-transform hover:scale-110 flex items-center"
+                onClick={() => setShowDeleteConfirm(true)}
+                title="Delete bill"
+              >
+                <Trash2 size={20} className="mr-1" />
+                <span className="sr-only">Delete</span>
+              </button>
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 text-sm italic pt-2 border-t border-gray-300 dark:border-gray-700">
+              No changes allowed
+            </div>
+          )}
         </div>
       )}
     </div>

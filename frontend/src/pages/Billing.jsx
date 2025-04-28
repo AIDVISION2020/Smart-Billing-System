@@ -6,7 +6,7 @@ import {
   saveCurrentBill,
 } from "../indexedDB/indexedDB.js";
 import { useEffect, useState } from "react";
-import { ReceiptIndianRupee, ChevronDown } from "lucide-react";
+import { ReceiptIndianRupee, ChevronDown, Search } from "lucide-react";
 import Spinner from "../components/spinner/Spinner.jsx";
 import UnfinishedBillCard from "../components/cards/UnfinishedBillCard.jsx";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +20,7 @@ const Billing = () => {
   const [visibleCount, setVisibleCount] = useState(6);
   const [sortOption, setSortOption] = useState("updated");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all"); // New filter state for completed/pending
   const [accessibleBranches, setAccessibleBranches] = useState([]);
   const [showBranchesDropdown, setShowBranchesDropdown] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -52,6 +53,26 @@ const Billing = () => {
       return 0;
     });
   };
+
+  const filteredBills = allUnfinishedBills
+    ? allUnfinishedBills.filter((bill) => {
+        const customerMatch = bill.customerName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const billNameMatch = bill.billName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+        // Filter by status: all, completed, or pending
+        const statusMatch =
+          filterStatus === "all" ||
+          (filterStatus === "completed" && bill.completed) ||
+          (filterStatus === "pending" && !bill.completed);
+
+        return (customerMatch || billNameMatch) && statusMatch;
+      })
+    : [];
+
   const generateBillId = () => {
     const timestamp = Date.now(); // in ms
     const base36 = timestamp.toString(36); // compact form
@@ -74,6 +95,7 @@ const Billing = () => {
         totalAmount: 0,
         subTotal: 0,
         totalTax: 0,
+        status: "pending", // New field to track bill status
         createdBy: authUser._id,
       };
 
@@ -85,21 +107,6 @@ const Billing = () => {
       toast.error("Error creating new bill:", error);
     }
   };
-
-  const filteredSortedBills = allUnfinishedBills
-    ? sortBills(
-        allUnfinishedBills.filter((bill) => {
-          const customerMatch = bill.customerName
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          const billNameMatch = bill.billName
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          return customerMatch || billNameMatch;
-        }),
-        sortOption
-      )
-    : [];
 
   useEffect(() => {
     const initializeIndexedDB = async () => {
@@ -131,14 +138,27 @@ const Billing = () => {
             {allUnfinishedBills.length > 0 ? (
               <div className="flex flex-col items-center gap-y-2 w-full">
                 <div className="w-full flex sm:flex-row items-center justify-between gap-1 sm:gap-4 mb-6">
+                  {/* Filter Dropdown for Status */}
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="w-32 px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-xl border border-gray-700 bg-gray-900 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 cursor-pointer"
+                  >
+                    <option value="all">All Bills</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                  </select>
                   {/* Search Bar */}
-                  <input
-                    type="text"
-                    placeholder="Search by bill/customer name..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-grow w-full sm:w-auto px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-xl border border-gray-700 bg-gray-900 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                  />
+                  <div className="flex items-center space-x-2 w-full sm:w-auto flex-1">
+                    <Search className="text-gray-500 dark:text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search by bill/customer name..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="flex-grow w-full px-4 py-2 text-sm rounded-xl border border-gray-700 bg-gray-900 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    />
+                  </div>
 
                   {/* Sort Dropdown */}
                   <select
@@ -157,7 +177,7 @@ const Billing = () => {
                 </h1>
                 <div className="flex flex-wrap gap-6 items-center justify-center w-full">
                   <div className="flex flex-wrap gap-6 items-center justify-center w-full">
-                    {filteredSortedBills.slice(0, visibleCount).map((bill) => (
+                    {filteredBills.slice(0, visibleCount).map((bill) => (
                       <div
                         key={bill.billName}
                         className="min-w-[40%] max-w-[95%] "
@@ -170,7 +190,7 @@ const Billing = () => {
                     ))}
                   </div>
 
-                  {visibleCount < filteredSortedBills.length && (
+                  {visibleCount < filteredBills.length && (
                     <button
                       onClick={() => setVisibleCount((prev) => prev + 10)}
                       className="mt-6 px-6 py-2 text-white font-semibold bg-blue-600 hover:bg-blue-700 rounded-xl shadow transition"
@@ -252,7 +272,6 @@ const Billing = () => {
             loadingMessage="Checking for previous bills..."
           />
         )}
-        {/* } */}
       </div>
     </div>
   );

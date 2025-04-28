@@ -67,12 +67,32 @@ export const createNewBill = async (req, res) => {
       }));
 
       await BillItem.bulkCreate(billItemsData, { transaction: t });
+
+      const Goods = defineGoodsModel(branchId);
+      const goodsPromises = items.map(async (item) => {
+        const goodsItem = await Goods.findOne({
+          where: { itemId: item.itemId },
+          transaction: t,
+        });
+        if (!goodsItem || goodsItem.quantity < item.quantity) {
+          throw new Error(
+            `Insufficient stock for item ${goodsItem?.name || item.itemId}`
+          );
+        }
+        await Goods.increment(
+          { quantity: -item.quantity },
+          { where: { itemId: item.itemId }, transaction: t }
+        );
+      });
+      await Promise.all(goodsPromises);
     });
 
     res.status(201).json({ message: "Bill created successfully" });
   } catch (err) {
     console.error("Error creating new bill:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({
+      error: err.message.length < 50 ? err.message : "Internal server error",
+    });
   }
 };
 

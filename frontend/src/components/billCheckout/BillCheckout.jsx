@@ -44,6 +44,10 @@ const BillCheckout = ({ currentBill, setCurrentBill }) => {
     const createNewBill = async () => {
       try {
         await createBill({ newBill: currentBill });
+        await saveCurrentBill({
+          ...currentBill,
+          completed: true,
+        });
       } catch (err) {
         toast.error("Error creating bill: " + err.message);
       }

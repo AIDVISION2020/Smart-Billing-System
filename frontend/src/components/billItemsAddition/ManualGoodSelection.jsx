@@ -84,6 +84,8 @@ const ManualGoodSelection = ({
                   ...good,
                   quantity: 1,
                   maxQuantity: good.quantity,
+                  tax: (good.tax * good.price) / 100,
+                  taxRate: good.tax,
                 })
               }
               className="w-full px-6 py-4 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer flex justify-between items-center gap-4 border border-gray-200 dark:border-gray-700"

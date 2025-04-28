@@ -9,7 +9,10 @@ const CurrentBill = ({ currentBill, setCurrentBill }) => {
         <>
           <span className="text-gray-900 text-xl font-bold">Current Bill</span>
           <div className="flex flex-col  overflow-x-auto ">
-            <CurrentBillTable currentBill={currentBill} />
+            <CurrentBillTable
+              currentBill={currentBill}
+              setCurrentBill={setCurrentBill}
+            />
           </div>
           <BillCheckout
             currentBill={currentBill}

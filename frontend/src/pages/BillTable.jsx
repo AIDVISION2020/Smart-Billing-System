@@ -6,7 +6,7 @@ import {
 } from "../indexedDB/indexedDB";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar/Navbar";
-import { ImageOff } from "lucide-react";
+import { ReceiptPoundSterling } from "lucide-react";
 import toast from "react-hot-toast";
 import Spinner from "../components/spinner/Spinner";
 import AutomaticItemAddition from "../components/billItemsAddition/AutomaticItemAddition";
@@ -92,7 +92,10 @@ const BillTable = () => {
                     className="block h-48 w-auto object-contain"
                   />
                 ) : (
-                  <ImageOff className="h-32 w-12 text-gray-400 dark:text-gray-600" />
+                  <ReceiptPoundSterling
+                    size={100}
+                    className="text-gray-400 dark:text-gray-600"
+                  />
                 )}
               </div>
 

@@ -34,6 +34,8 @@ export const saveCurrentBill = (bill) => {
   const currTime = Date.now();
   if (!bill.createdAt) bill.createdAt = currTime;
   bill.lastUpdatedAt = currTime;
+  bill.completed = bill.completed || false;
+
   return new Promise((resolve, reject) => {
     if (!db)
       return reject("Database not initialized. Call openDatabase first.");
