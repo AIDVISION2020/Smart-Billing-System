@@ -7,6 +7,11 @@ import { ArrowRight } from "lucide-react";
 const LandingPage = () => {
   const { authUser } = useAuthContext();
 
+  // Check if pageslink.roles array has the user role
+  const hasAccess = (page) => {
+    return page.Roles ? page.Roles.includes(authUser?.role) : false;
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       {/* Navbar */}
@@ -30,70 +35,78 @@ const LandingPage = () => {
 
         <div className="flex flex-wrap justify-center gap-6">
           {/* Card 1 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Manage Users
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              Add or update Admins, Branch Admins, or Billers.
-            </p>
-            <Link
-              to={PagesLink.MANAGE_USERS.link}
-              className="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold"
-            >
-              Manage Users <ArrowRight size={18} />
-            </Link>
-          </div>
+          {hasAccess(PagesLink.MANAGE_USERS) && (
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Manage Users
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Add or update Admins, Branch Admins, or Billers.
+              </p>
+              <Link
+                to={PagesLink.MANAGE_USERS.link}
+                className="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold"
+              >
+                Manage Users <ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
 
           {/* Card 2 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Categories & Goods
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              Organize inventory by editing categories and goods.
-            </p>
-            <Link
-              to={PagesLink.MANAGE_GOODS.link}
-              className="inline-flex items-center gap-1 text-pink-600 hover:underline font-semibold"
-            >
-              Manage Items <ArrowRight size={18} />
-            </Link>
-          </div>
+          {hasAccess(PagesLink.MANAGE_GOODS) && (
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Categories & Goods
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Organize inventory by editing categories and goods.
+              </p>
+              <Link
+                to={PagesLink.MANAGE_GOODS.link}
+                className="inline-flex items-center gap-1 text-pink-600 hover:underline font-semibold"
+              >
+                Manage Items <ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
 
           {/* Card 3 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Perform Billing
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              Create invoices, manage transactions, and streamline your billing
-              process efficiently.
-            </p>
-            <Link
-              to={PagesLink.BILLING.link}
-              className="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold"
-            >
-              Start Billing <ArrowRight size={18} />
-            </Link>
-          </div>
+          {hasAccess(PagesLink.BILLING) && (
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Perform Billing
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Create invoices, manage transactions, and streamline your
+                billing process efficiently.
+              </p>
+              <Link
+                to={PagesLink.BILLING.link}
+                className="inline-flex items-center gap-1 text-indigo-600 hover:underline font-semibold"
+              >
+                Start Billing <ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
 
           {/* Card 4 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              View Analytics
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              Explore sales trends, top-performing items, and key metrics to
-              drive smarter decisions.
-            </p>
-            <Link
-              to={PagesLink.ANALYTICS.link}
-              className="inline-flex items-center gap-1 text-pink-600 hover:underline font-semibold"
-            >
-              Go to Analytics <ArrowRight size={18} />
-            </Link>
-          </div>
+          {hasAccess(PagesLink.ANALYTICS) && (
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-72 flex flex-col items-start text-left transition-transform hover:scale-105">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                View Analytics
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Explore sales trends, top-performing items, and key metrics to
+                drive smarter decisions.
+              </p>
+              <Link
+                to={PagesLink.ANALYTICS.link}
+                className="inline-flex items-center gap-1 text-pink-600 hover:underline font-semibold"
+              >
+                Go to Analytics <ArrowRight size={18} />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

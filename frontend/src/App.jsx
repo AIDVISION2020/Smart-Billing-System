@@ -23,10 +23,8 @@ function App() {
           path="/"
           element={
             authUser ? (
-              userRole === Roles.ADMIN ? (
+              userRole === Roles.ADMIN || userRole === Roles.BRANCHADMIN ? (
                 <LandingPage />
-              ) : userRole === Roles.BRANCHADMIN ? (
-                <Navigate to="/manage-goods" />
               ) : (
                 <Navigate to="/billing" />
               )
@@ -57,7 +55,7 @@ function App() {
             !authUser ? (
               <Navigate to="/login" />
             ) : userRole === Roles.BILLER ? (
-              <Navigate to="/billing" />
+              <Navigate to="/" />
             ) : (
               <ManageGoods />
             )
@@ -69,7 +67,7 @@ function App() {
             !authUser ? (
               <Navigate to="/login" />
             ) : userRole === Roles.BRANCHADMIN ? (
-              <Navigate to="/manage-goods" />
+              <Navigate to="/" />
             ) : (
               <Billing />
             )
@@ -81,7 +79,7 @@ function App() {
             !authUser ? (
               <Navigate to="/login" />
             ) : userRole === Roles.BRANCHADMIN ? (
-              <Navigate to="/manage-goods" />
+              <Navigate to="/" />
             ) : (
               <BillTable />
             )

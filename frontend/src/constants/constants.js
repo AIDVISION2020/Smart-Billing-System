@@ -55,22 +55,27 @@ export const PagesLink = Object.freeze({
   MANAGE_USERS: {
     link: "/manage-users",
     name: "Manage Users",
+    Roles: [Roles.ADMIN],
   },
   MANAGE_GOODS: {
     link: "/manage-goods",
     name: "Manage Goods",
+    Roles: [Roles.ADMIN, Roles.BRANCHADMIN],
   },
   BILLING: {
     link: "/billing",
     name: "Billing",
+    Roles: [Roles.ADMIN, Roles.BILLER],
   },
   BILLING_TABLE: {
     link: "/billing", //:billName,
     name: "Billing Table",
+    Roles: [Roles.ADMIN, Roles.BILLER],
   },
   ANALYTICS: {
     link: "/analytics",
     name: "Analytics",
+    Roles: [Roles.ADMIN, Roles.BRANCHADMIN],
   },
 });
 
@@ -86,10 +91,6 @@ export const AnalyticsTypes = [
   {
     title: "Stock Insights",
     description: "Track low, fast-moving, and stagnant inventory.",
-  },
-  {
-    title: "Time Trends",
-    description: "Sales patterns by hour, day, week, and month.",
   },
 ];
 

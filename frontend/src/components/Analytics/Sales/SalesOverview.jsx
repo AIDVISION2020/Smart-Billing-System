@@ -25,8 +25,10 @@ import {
   exportTopSellingItemsToCSV,
   exportTrendsToCSV,
 } from "./utils";
+import { ChevronDown } from "lucide-react";
 import StatCard from "../StatCard";
 import AnalysisDatePicker from "../AnalysisDatePicker";
+import useGetAccessibleBranches from "../../../hooks/useGetAccessibleBranches";
 
 const BAR_COLORS = ["#4F46E5", "#059669", "#F59E0B", "#EF4444", "#8B5CF6"];
 
@@ -34,11 +36,15 @@ const SalesOverview = () => {
   const { authUser } = useAuthContext();
   const { getBillsSummary } = useGetBillsSalesSummary();
   const { getBillItemsSummary } = useGetBillItemsSalesSummary();
+  const { getAccessibleBranches } = useGetAccessibleBranches();
 
   const today = new Date().toISOString().split("T")[0];
   const [startDate, setStartDate] = useState(
     () => new Date(new Date().setDate(1)).toISOString().split("T")[0]
   );
+
+  const [allBranches, setAllBranches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [endDate, setEndDate] = useState(today);
   const [loading, setLoading] = useState(false);
   const [chartMetric, setChartMetric] = useState("quantity");
@@ -50,6 +56,8 @@ const SalesOverview = () => {
   });
   const [allItems, setAllItems] = useState([]);
   const [allBills, setAllBills] = useState([]);
+  const [hasFetchedInitially, setHasFetchedInitially] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const topItems = useMemo(() => {
     let sorted = Object.values(allItems).sort(
@@ -57,8 +65,6 @@ const SalesOverview = () => {
     );
     return sorted.slice(0, 5);
   }, [allItems, chartMetric]);
-
-  const [hasFetchedInitially, setHasFetchedInitially] = useState(false);
 
   const fetchSalesSummary = useCallback(async () => {
     try {
@@ -75,12 +81,12 @@ const SalesOverview = () => {
 
       const [billsSummary, itemsSummary] = await Promise.all([
         getBillsSummary({
-          branchId: authUser.branchId,
+          branchId: selectedBranch?.branchId || authUser.branchId,
           startDate: start.toISOString(),
           endDate: end.toISOString(),
         }),
         getBillItemsSummary({
-          branchId: authUser.branchId,
+          branchId: selectedBranch?.branchId || authUser.branchId,
           startDate: start.toISOString(),
           endDate: end.toISOString(),
         }),
@@ -134,7 +140,26 @@ const SalesOverview = () => {
     } finally {
       setLoading(false);
     }
-  }, [authUser, startDate, endDate, getBillsSummary, getBillItemsSummary]);
+  }, [
+    authUser,
+    startDate,
+    endDate,
+    getBillsSummary,
+    getBillItemsSummary,
+    selectedBranch,
+  ]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const branches = await getAccessibleBranches();
+        setAllBranches(branches);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+    fetchBranches();
+  }, [getAccessibleBranches]);
 
   useEffect(() => {
     if (!hasFetchedInitially) {
@@ -159,6 +184,71 @@ const SalesOverview = () => {
           <h2 className="text-2xl sm:text-4xl font-extrabold mb-6 text-gray-800">
             Sales Overview
           </h2>
+
+          <div className="w-full flex flex-col items-center justify-center rounded-lg mb-6 py-2 sm:px-4">
+            <div className="flex items-center w-full sm:w-[250px] gap-2 justify-center bg-gray-300 py-2 px-4 rounded-2xl">
+              <label
+                htmlFor="branchID"
+                className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap"
+              >
+                Branch ID
+              </label>
+              {allBranches.length > 1 ? (
+                <div className="relative w-full sm:w-[200px]">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-full px-4 py-2 border rounded-lg flex justify-between items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-all focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600"
+                  >
+                    <span className="text-gray-700 dark:text-gray-300 font-medium truncate">
+                      {selectedBranch?.branchId ?? "Select"}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <ul className="absolute w-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-auto max-h-36 custom-scrollbar dark-scroll divide-y divide-gray-200 dark:divide-gray-700">
+                      <li
+                        key={0}
+                        onClick={() => {
+                          setSelectedBranch(null);
+                          setIsOpen(false);
+                          setHasFetchedInitially(false);
+                        }}
+                        className="cursor-pointer px-4 py-2 transition-all hover:bg-blue-500 hover:text-white text-gray-800 dark:text-gray-300 dark:hover:bg-blue-600"
+                      >
+                        <span className="font-semibold">All branches</span>
+                      </li>
+                      {allBranches.map((branch) => (
+                        <li
+                          key={branch.branchId}
+                          onClick={() => {
+                            setSelectedBranch(branch);
+                            setIsOpen(false);
+                            setHasFetchedInitially(false);
+                          }}
+                          className="cursor-pointer px-4 py-2 transition-all hover:bg-blue-500 hover:text-white text-gray-800 dark:text-gray-300 dark:hover:bg-blue-600"
+                        >
+                          <span className="font-medium">{branch.branchId}</span>{" "}
+                          - {branch.location}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <span className="font-medium">
+                    {allBranches[0]?.branchId}
+                  </span>{" "}
+                  - {allBranches[0]?.location}
+                </div>
+              )}
+            </div>
+          </div>
 
           <AnalysisDatePicker
             startDate={startDate}

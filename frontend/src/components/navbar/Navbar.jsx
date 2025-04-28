@@ -13,9 +13,14 @@ const Navbar = ({
 }) => {
   const { authUser } = useAuthContext();
 
+  // Check if pageslink.roles array has the user role
+  const hasAccess = (page) => {
+    return page.Roles ? page.Roles.includes(authUser?.role) : false;
+  };
+
   const generateNavItem = (page) => {
     const isActive = currentPageName === page.name;
-
+    if (!hasAccess(page)) return null;
     const commonClasses =
       "text-center block px-4 py-2 text-white shadow-md transition-all duration-300";
     const activeClasses = "bg-green-600 cursor-not-allowed";
@@ -43,16 +48,14 @@ const Navbar = ({
 
   const navigations = disableDefaultNavigations
     ? dropDownElements
-    : authUser?.role === Roles.ADMIN
-    ? [
+    : [
         generateNavItem(PagesLink.LANDING),
         generateNavItem(PagesLink.MANAGE_USERS),
         generateNavItem(PagesLink.MANAGE_GOODS),
         generateNavItem(PagesLink.BILLING),
         generateNavItem(PagesLink.ANALYTICS),
         ...dropDownElements,
-      ]
-    : [null];
+      ];
 
   dropDownElements = [
     <div

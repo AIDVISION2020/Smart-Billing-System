@@ -41,6 +41,9 @@ const StockInsights = () => {
       try {
         const branches = await getAccessibleBranches();
         setAllBranches(branches);
+        if (branches.length === 1) {
+          setSelectedBranch(branches[0]);
+        }
       } catch (error) {
         toast.error(error.message);
       }
@@ -80,41 +83,50 @@ const StockInsights = () => {
               >
                 Branch ID
               </label>
-              <div className="relative w-full sm:w-[200px]">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="w-full px-4 py-2 border rounded-lg flex justify-between items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-all focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600"
-                >
-                  <span className="text-gray-700 dark:text-gray-300 font-medium truncate">
-                    {selectedBranch?.branchId ?? "Select"}
-                  </span>
-                  <ChevronDown
-                    className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+              {allBranches.length > 1 ? (
+                <div className="relative w-full sm:w-[200px]">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-full px-4 py-2 border rounded-lg flex justify-between items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-all focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600"
+                  >
+                    <span className="text-gray-700 dark:text-gray-300 font-medium truncate">
+                      {selectedBranch?.branchId ?? "Select"}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
-                {isOpen && (
-                  <ul className="absolute w-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-auto max-h-36 custom-scrollbar dark-scroll divide-y divide-gray-200 dark:divide-gray-700">
-                    {allBranches.map((branch) => (
-                      <li
-                        key={branch.branchId}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setIsOpen(false);
-                          setHasFetchedInitially(false);
-                        }}
-                        className="cursor-pointer px-4 py-2 transition-all hover:bg-blue-500 hover:text-white text-gray-800 dark:text-gray-300 dark:hover:bg-blue-600"
-                      >
-                        <span className="font-medium">{branch.branchId}</span> -{" "}
-                        {branch.location}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                  {isOpen && (
+                    <ul className="absolute w-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-auto max-h-36 custom-scrollbar dark-scroll divide-y divide-gray-200 dark:divide-gray-700">
+                      {allBranches.map((branch) => (
+                        <li
+                          key={branch.branchId}
+                          onClick={() => {
+                            setSelectedBranch(branch);
+                            setIsOpen(false);
+                            setHasFetchedInitially(false);
+                          }}
+                          className="cursor-pointer px-4 py-2 transition-all hover:bg-blue-500 hover:text-white text-gray-800 dark:text-gray-300 dark:hover:bg-blue-600"
+                        >
+                          <span className="font-medium">{branch.branchId}</span>{" "}
+                          - {branch.location}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <span className="font-medium">
+                    {allBranches[0]?.branchId}
+                  </span>{" "}
+                  - {allBranches[0]?.location}
+                </div>
+              )}
             </div>
           </div>
 

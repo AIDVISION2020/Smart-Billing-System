@@ -6,7 +6,6 @@ import { Menu, X } from "lucide-react";
 import SalesOverview from "../components/Analytics/Sales/SalesOverview.jsx";
 import ItemsOverview from "../components/Analytics/Items/ItemsOverview.jsx";
 import StockInsights from "../components/Analytics/Stock/StockInsights.jsx";
-import TimeTrends from "../components/Analytics/Time/TimeTrends.jsx";
 
 const Analytics = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +16,6 @@ const Analytics = () => {
     "Sales Summary": <SalesOverview />,
     "Item Breakdown": <ItemsOverview />,
     "Stock Insights": <StockInsights />,
-    "Time Trends": <TimeTrends />,
   };
 
   const SelectedComponent = componentMap[selectedAnalyticsType] || null;
