@@ -20,10 +20,10 @@ const checkBillingAuthority = async (req, res, next) => {
       attributes: ["role", "userId"],
     });
 
-    if (user?.role !== Roles.ADMIN && user?.role !== Roles.BILLER)
+    if (user?.role !== Roles.BILLER)
       return res
         .status(403)
-        .json({ error: "Forbidden - Admin or Biller access required" });
+        .json({ error: "Forbidden - Biller access required" });
 
     req.user = user;
     next();

@@ -191,7 +191,7 @@ const SalesOverview = () => {
                 htmlFor="branchID"
                 className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap"
               >
-                Branch ID
+                Branch:
               </label>
               {allBranches.length > 1 ? (
                 <div className="relative w-full sm:w-[200px]">
@@ -201,7 +201,7 @@ const SalesOverview = () => {
                     className="w-full px-4 py-2 border rounded-lg flex justify-between items-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-md hover:shadow-lg transition-all focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600"
                   >
                     <span className="text-gray-700 dark:text-gray-300 font-medium truncate">
-                      {selectedBranch?.branchId ?? "Select"}
+                      {selectedBranch?.branchId ?? "All branches"}
                     </span>
                     <ChevronDown
                       className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform ${

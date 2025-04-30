@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useModifyGood from "@/hooks/useModifyGood";
 import Spinner from "@/components/spinner/Spinner";
-import { X as Close, Save, Replace } from "lucide-react";
+import { X as Close, Save, Replace, ImagePlus } from "lucide-react";
 import propTypes from "prop-types";
+import { Cloudinary } from "../../constants/constants";
+import toast from "react-hot-toast";
 
 const UpdateGoodModal = ({
   showModal,
@@ -12,6 +14,10 @@ const UpdateGoodModal = ({
   currGood,
   categoryName,
 }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [updatedGood, setUpdatedGood] = useState({
     name: currGood.name || "",
     description: currGood.description || "",
@@ -20,8 +26,51 @@ const UpdateGoodModal = ({
     tax: currGood.tax || 0,
     itemId: currGood.itemId,
   });
-  const [isDisabled, setIsDisabled] = useState(true);
   const { loading, modifyGood } = useModifyGood();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file");
+      return;
+    }
+    if (file.type === "image/heic" || file.name.endsWith(".heic")) {
+      toast.error("HEIC images are not supported. Please upload JPG or PNG.");
+      return;
+    }
+    if (file.size > 10485760) {
+      toast.error(
+        "The image size exceeds 1 MB. Please upload a smaller image."
+      );
+      return;
+    }
+    if (file) {
+      setImageFile(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadToCloudinary = async (file) => {
+    setImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", Cloudinary.UPLOAD_PRESET);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${Cloudinary.CLOUD_NAME}/image/upload`,
+        { method: "POST", body: formData }
+      );
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error?.message || "Image upload failed");
+
+      return data.secure_url;
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,23 +79,6 @@ const UpdateGoodModal = ({
       [name]: value.trimStart(),
     }));
   };
-
-  useEffect(() => {
-    setIsDisabled(() => {
-      for (const key in updatedGood) {
-        const updatedValue = updatedGood[key];
-        const currentValue = currGood[key];
-
-        // Convert to numbers only if they are numeric
-        const isNumeric = !isNaN(updatedValue) && !isNaN(currentValue);
-        if (isNumeric && Number(updatedValue) !== Number(currentValue))
-          return false;
-
-        if (!isNumeric && updatedValue !== currentValue) return false;
-      }
-      return true;
-    });
-  }, [updatedGood, currGood]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,9 +89,22 @@ const UpdateGoodModal = ({
       }
     }
 
-    await modifyGood({ branchId, good: updatedGood });
-    setShowModal(false);
-    setGoodListChangedCnt((prev) => prev + 1);
+    const updateFlow = async () => {
+      let imageUrl = currGood.imageUrl;
+
+      if (imageFile) {
+        imageUrl = await uploadToCloudinary(imageFile);
+      }
+      await modifyGood({ branchId, good: { ...updatedGood, imageUrl } });
+
+      setPreviewImage(null);
+      setImageFile(null);
+      setShowModal(false);
+      setGoodListChangedCnt((prev) => prev + 1);
+    };
+    toast.promise(updateFlow, {
+      loading: "Updating Item...",
+    });
   };
 
   return (
@@ -175,6 +220,51 @@ const UpdateGoodModal = ({
               />
             </div>
 
+            {/* Modern Image Upload */}
+            <div className="w-full flex flex-col items-center justify-center">
+              <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2 text-start w-full">
+                Item Image
+              </label>
+
+              <div className="relative rounded-xl cursor-pointer transition-colors">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                />
+
+                <div className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-500 transition-colors p-1">
+                  {previewImage || currGood.imageUrl ? (
+                    <>
+                      {/* Skeleton placeholder while image loads */}
+                      {imageLoading && !previewImage && (
+                        <div className="w-[256px] h-40 rounded-lg animate-pulse bg-gray-200 dark:bg-gray-700" />
+                      )}
+
+                      {/* Actual image */}
+                      <img
+                        src={previewImage || currGood.imageUrl}
+                        alt="Preview"
+                        onLoad={() => setImageLoading(false)}
+                        onError={() => setImageLoading(false)}
+                        className={`max-w-[256px] h-40 object-contain rounded-lg transition-opacity duration-300 ${
+                          imageLoading ? "opacity-0 absolute" : "opacity-100"
+                        }`}
+                      />
+                    </>
+                  ) : (
+                    <div className="w-[256px] h-40 flex flex-col items-center justify-center space-y-2">
+                      <ImagePlus className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                      <p className="text-sm text-gray-500 dark:text-gray-400 text-center px-2">
+                        Click or drag to upload a new image (max 1MB)
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Price Input */}
             <div>
               <div className="flex justify-between items-center">
@@ -271,17 +361,17 @@ const UpdateGoodModal = ({
 
             {/* Submit Button */}
             <button
-              disabled={isDisabled}
+              disabled={loading || imageUploading}
               type="submit"
               className={`w-full flex items-center justify-center px-5 py-3 rounded-lg shadow-lg transition-all duration-300 
                 ${
-                  isDisabled
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 text-white focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-500"
+                  loading || imageUploading
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 dark:focus:ring-blue-500"
                 }
               `}
             >
-              {loading ? (
+              {loading || imageUploading ? (
                 <Spinner dotStyles="bg-white h-3 w-3" />
               ) : (
                 <>

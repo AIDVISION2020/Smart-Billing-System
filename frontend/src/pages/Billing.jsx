@@ -20,7 +20,6 @@ const Billing = () => {
   const [visibleCount, setVisibleCount] = useState(6);
   const [sortOption, setSortOption] = useState("updated");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // New filter state for completed/pending
   const [accessibleBranches, setAccessibleBranches] = useState([]);
   const [showBranchesDropdown, setShowBranchesDropdown] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -63,13 +62,7 @@ const Billing = () => {
           ?.toLowerCase()
           .includes(searchQuery.toLowerCase());
 
-        // Filter by status: all, completed, or pending
-        const statusMatch =
-          filterStatus === "all" ||
-          (filterStatus === "completed" && bill.completed) ||
-          (filterStatus === "pending" && !bill.completed);
-
-        return (customerMatch || billNameMatch) && statusMatch;
+        return customerMatch || billNameMatch;
       })
     : [];
 
@@ -125,6 +118,8 @@ const Billing = () => {
     initializeIndexedDB();
   }, [updatedBillListCnt, authUser.userId]);
 
+  const sortedBills = sortBills(filteredBills, sortOption);
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <Navbar currentPageName={PagesLink.BILLING.name} />
@@ -138,16 +133,6 @@ const Billing = () => {
             {allUnfinishedBills.length > 0 ? (
               <div className="flex flex-col items-center gap-y-2 w-full">
                 <div className="w-full flex sm:flex-row items-center justify-between gap-1 sm:gap-4 mb-6">
-                  {/* Filter Dropdown for Status */}
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="w-32 px-2 py-1 sm:px-4 sm:py-2 text-sm rounded-xl border border-gray-700 bg-gray-900 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 cursor-pointer"
-                  >
-                    <option value="all">All Bills</option>
-                    <option value="completed">Completed</option>
-                    <option value="pending">Pending</option>
-                  </select>
                   {/* Search Bar */}
                   <div className="flex items-center space-x-2 w-full sm:w-auto flex-1">
                     <Search className="text-gray-500 dark:text-gray-400" />
@@ -173,11 +158,11 @@ const Billing = () => {
                 </div>
 
                 <h1 className="text-3xl lg:text-4xl font-extrabold tracking-wide text-gray-700 dark:text-white uppercase mb-6">
-                  Stored Bills
+                  Unfinished Bills
                 </h1>
                 <div className="flex flex-wrap gap-6 items-center justify-center w-full">
                   <div className="flex flex-wrap gap-6 items-center justify-center w-full">
-                    {filteredBills.slice(0, visibleCount).map((bill) => (
+                    {sortedBills.slice(0, visibleCount).map((bill) => (
                       <div
                         key={bill.billName}
                         className="min-w-[40%] max-w-[95%] "

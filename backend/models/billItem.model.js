@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../db/connect.db.js";
 
 const defineBillItemModel = (branchId) => {
-  const tableName = `billItem_${branchId}`;
+  const tableName = `bill_item_${branchId}`;
 
   return sequelize.define(
     "Bill_Item",

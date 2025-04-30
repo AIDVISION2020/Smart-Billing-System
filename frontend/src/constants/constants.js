@@ -60,17 +60,17 @@ export const PagesLink = Object.freeze({
   MANAGE_GOODS: {
     link: "/manage-goods",
     name: "Manage Goods",
-    Roles: [Roles.ADMIN, Roles.BRANCHADMIN],
+    Roles: [Roles.BRANCHADMIN],
   },
   BILLING: {
     link: "/billing",
     name: "Billing",
-    Roles: [Roles.ADMIN, Roles.BILLER],
+    Roles: [Roles.BILLER],
   },
   BILLING_TABLE: {
     link: "/billing", //:billName,
     name: "Billing Table",
-    Roles: [Roles.ADMIN, Roles.BILLER],
+    Roles: [Roles.BILLER],
   },
   ANALYTICS: {
     link: "/analytics",

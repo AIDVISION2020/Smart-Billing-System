@@ -1,14 +1,10 @@
-import NewBranchCard from "../cards/newBranchCard";
 import BranchCard from "../cards/branchCard";
 import useGetAccessibleBranches from "../../hooks/useGetAccessibleBranches";
 import { useState, useEffect } from "react";
 import propTypes from "prop-types";
-import { Roles } from "../../constants/constants";
 import Spinner from "../spinner/Spinner";
 
-const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
-  const [branchListUpdCount, setBranchListUpdCount] = useState(0);
-
+const AllBranches = ({ selectedBranch, setSelectedBranch }) => {
   const { loading, getAccessibleBranches } = useGetAccessibleBranches();
   const [accessibleBranches, setAccessibleBranches] = useState([]);
   const [networkReq, setNetworkReq] = useState(false);
@@ -20,7 +16,7 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
       setNetworkReq(true);
     };
     fetchAccessibleBranches();
-  }, [branchListUpdCount, getAccessibleBranches]);
+  }, [getAccessibleBranches]);
 
   return (
     <div
@@ -69,16 +65,11 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
                     key={branch.branchId}
                     branchId={branch.branchId}
                     branchLocation={branch.location}
-                    setBranchListUpdCount={setBranchListUpdCount}
                     setSelectedBranch={setSelectedBranch}
                     selectedBranch={selectedBranch}
                   />
                 ))}
               </div>
-            )}
-            {/* Admin: Add New Branch Card */}
-            {userRole === Roles.ADMIN && !selectedBranch && (
-              <NewBranchCard setBranchListUpdCount={setBranchListUpdCount} />
             )}
           </>
         )}
@@ -88,7 +79,6 @@ const AllBranches = ({ userRole, selectedBranch, setSelectedBranch }) => {
 };
 
 AllBranches.propTypes = {
-  userRole: propTypes.string.isRequired,
   selectedBranch: propTypes.string,
   setSelectedBranch: propTypes.func.isRequired,
 };

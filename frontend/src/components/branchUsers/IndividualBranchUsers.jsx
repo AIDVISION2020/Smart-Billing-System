@@ -5,7 +5,11 @@ import { useState, useEffect } from "react";
 import useGetUsersByBranchId from "@/hooks/useGetUsersByBranchId";
 import Spinner from "../spinner/Spinner";
 
-const IndividualBranchUsers = ({ branch, allBranches }) => {
+const IndividualBranchUsers = ({
+  branch,
+  allBranches,
+  setBranchListUpdCount,
+}) => {
   const [included, setIncluded] = useState(false);
   const [users, setUsers] = useState([]);
   const { loading, getUsers } = useGetUsersByBranchId();
@@ -32,6 +36,7 @@ const IndividualBranchUsers = ({ branch, allBranches }) => {
         setIncluded={() => setIncluded(!included)}
         branch={branch}
         setUsersListUpdCnt={setUsersListUpdCnt}
+        setBranchListUpdCount={setBranchListUpdCount}
       />
       {included && (
         <div className="mt-4 mb-8 flex justify-center items-center">
@@ -64,6 +69,7 @@ const IndividualBranchUsers = ({ branch, allBranches }) => {
 IndividualBranchUsers.propTypes = {
   branch: propTypes.object.isRequired,
   allBranches: propTypes.array.isRequired,
+  setBranchListUpdCount: propTypes.func.isRequired,
 };
 
 export default IndividualBranchUsers;

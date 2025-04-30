@@ -27,11 +27,6 @@ const defineCategoryModel = (branchId) => {
         allowNull: false,
         unique: true,
       },
-      imageUrl: {
-        type: DataTypes.STRING,
-        defaultValue:
-          "https://cdn.pixabay.com/photo/2024/06/26/23/36/package-8856091_640.png",
-      },
     },
     {
       tableName: tableName, // Set the dynamic table name

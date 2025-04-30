@@ -30,13 +30,13 @@ const BranchCardTools_Admin = ({
   const toggalModalMessage = <Trash2 size={24} strokeWidth={3} color={"red"} />;
 
   return (
-    <div className="w-full flex justify-end items-center ">
+    <div className="w-full flex justify-evenly items-center ">
       {/* Update branch */}
       <>
         <Pencil
           size={24}
           strokeWidth={3}
-          className="text-blue-600 dark:text-blue-400 transition-all duration-300 group-hover:text-blue-700 dark:group-hover:text-blue-300"
+          className="text-blue-500 dark:text-blue-400 transition-all duration-300 group-hover:text-blue-700 dark:group-hover:text-blue-300"
           onClick={() => setOpenUpdBranchModal(true)}
         />
         {openUpdBranchModal && (

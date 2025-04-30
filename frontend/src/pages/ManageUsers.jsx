@@ -5,20 +5,24 @@ import AdminUsers from "../components/branchUsers/AdminUsers";
 import { useState, useEffect } from "react";
 import Spinner from "../components/spinner/Spinner";
 import { PagesLink } from "../constants/constants";
+import { Roles } from "../constants/constants";
+import { useAuthContext } from "../context/AuthContext";
+import NewBranchCard from "../components/cards/newBranchCard";
 
 const ManageUsers = () => {
+  const { authUser } = useAuthContext();
+  const userRole = authUser?.role;
   const { loading, getAccessibleBranches } = useGetAccessibleBranches();
   const [accessibleBranches, setAccessibleBranches] = useState([]);
-  const [networkReq, setNetworkReq] = useState(false);
+  const [branchListUpdCount, setBranchListUpdCount] = useState(0);
 
   useEffect(() => {
     const fetchAccessibleBranches = async () => {
       const branches = await getAccessibleBranches();
       setAccessibleBranches(branches);
-      setNetworkReq(true);
     };
     fetchAccessibleBranches();
-  }, [getAccessibleBranches]);
+  }, [getAccessibleBranches, branchListUpdCount]);
 
   return (
     <>
@@ -33,15 +37,6 @@ const ManageUsers = () => {
             loadingMessageStyles="text-4xl font-bold text-black"
             loadingMessage="Fetching accessible branches..."
           />
-        ) : networkReq && accessibleBranches.length === 0 ? (
-          <div className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-l-4 border-red-600 dark:border-red-400 px-6 py-6 rounded-lg shadow-lg max-w-lg text-center animate-fadeIn">
-            <h2 className="text-3xl sm:text-4xl font-bold">
-              No Branches Accessible
-            </h2>
-            <p className="text-lg sm:text-xl mt-2">
-              You don&apos;t have access to any branches yet.
-            </p>
-          </div>
         ) : (
           <>
             <h2
@@ -57,9 +52,14 @@ const ManageUsers = () => {
                   key={branch.branchId}
                   branch={branch}
                   allBranches={accessibleBranches}
+                  setBranchListUpdCount={setBranchListUpdCount}
                 />
               ))}
               <AdminUsers />
+              {/* Admin: Add New Branch Card */}
+              {userRole === Roles.ADMIN && (
+                <NewBranchCard setBranchListUpdCount={setBranchListUpdCount} />
+              )}
             </div>
           </>
         )}

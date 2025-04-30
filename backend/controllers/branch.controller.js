@@ -25,7 +25,7 @@ export const addNewBranchController = async (req, res) => {
       goodsTableName: `goods_${branchId}`,
       categoriesTableName: `categories_${branchId}`,
       billTableName: `bill_${branchId}`,
-      billItemTableName: `billItem_${branchId}`,
+      billItemTableName: `bill_item_${branchId}`,
     });
 
     const branchCategory = defineCategoryModel(branchId);
@@ -66,7 +66,7 @@ export const deleteBranchByIdController = async (req, res) => {
     if (deletedRows.length === 0) resMsg = "Nothing to delete";
     else {
       resMsg = `${deletedRows} branch deleted successfully`;
-      await sequelize.getQueryInterface().dropTable(`billItem_${branchId}`);
+      await sequelize.getQueryInterface().dropTable(`bill_item_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`goods_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`categories_${branchId}`);
       await sequelize.getQueryInterface().dropTable(`bill_${branchId}`);
@@ -86,6 +86,7 @@ export const updateBranchController = async (req, res) => {
       return res.status(404).json({ error: "Old BranchId is required" });
     if (
       branchId &&
+      branchId !== oldBranchId && // Check if branchId is different from oldBranchId
       (await Branch.findOne({
         where: { branchId },
       }))
@@ -101,6 +102,8 @@ export const updateBranchController = async (req, res) => {
     if (updateData.branchId) {
       updateData.goodsTableName = `goods_${branchId}`;
       updateData.categoriesTableName = `categories_${branchId}`;
+      updateData.billItemTableName = `bill_item_${branchId}`;
+      updateData.billTableName = `bill_${branchId}`;
     }
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: "No valid fields to update" });
@@ -119,6 +122,12 @@ export const updateBranchController = async (req, res) => {
       await sequelize
         .getQueryInterface()
         .renameTable(`goods_${oldBranchId}`, `goods_${branchId}`);
+      await sequelize
+        .getQueryInterface()
+        .renameTable(`bill_${oldBranchId}`, `bill_${branchId}`);
+      await sequelize
+        .getQueryInterface()
+        .renameTable(`bill_item_${oldBranchId}`, `bill_item_${branchId}`);
     }
     return res.status(200).json({ message: "Branch updated successfully" });
   } catch (err) {

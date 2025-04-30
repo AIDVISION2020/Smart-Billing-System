@@ -54,7 +54,7 @@ function App() {
           element={
             !authUser ? (
               <Navigate to="/login" />
-            ) : userRole === Roles.BILLER ? (
+            ) : userRole !== Roles.BRANCHADMIN ? (
               <Navigate to="/" />
             ) : (
               <ManageGoods />
@@ -66,7 +66,7 @@ function App() {
           element={
             !authUser ? (
               <Navigate to="/login" />
-            ) : userRole === Roles.BRANCHADMIN ? (
+            ) : userRole !== Roles.BILLER ? (
               <Navigate to="/" />
             ) : (
               <Billing />
@@ -78,7 +78,7 @@ function App() {
           element={
             !authUser ? (
               <Navigate to="/login" />
-            ) : userRole === Roles.BRANCHADMIN ? (
+            ) : userRole !== Roles.BILLER ? (
               <Navigate to="/" />
             ) : (
               <BillTable />

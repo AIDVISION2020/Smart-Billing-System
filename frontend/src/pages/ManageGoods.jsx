@@ -1,4 +1,3 @@
-import { useAuthContext } from "@/context/authContext";
 import AllBranches from "../components/allBranches/AllBranches.jsx";
 import SelectedBranch from "../components/selectedBranch/SelectedBranch.jsx";
 import { useState } from "react";
@@ -6,14 +5,12 @@ import Navbar from "../components/navbar/Navbar.jsx";
 import { PagesLink } from "../constants/constants.js";
 
 const ManageGoods = () => {
-  const { authUser } = useAuthContext();
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <Navbar currentPageName={PagesLink.MANAGE_GOODS.name} />
       <AllBranches
-        userRole={authUser?.role}
         selectedBranch={selectedBranch}
         setSelectedBranch={setSelectedBranch}
       />

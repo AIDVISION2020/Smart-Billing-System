@@ -216,23 +216,20 @@ const UpdateUserModal = ({
               onClick={() =>
                 setUpdatedUser((prev) => ({
                   ...prev,
-                  role:
-                    prev.role === Roles.BRANCHADMIN
-                      ? Roles.ADMIN
-                      : Roles.BRANCHADMIN,
+                  role: prev.role !== Roles.ADMIN ? Roles.ADMIN : currUser.role,
                 }))
               }
               className={`px-4 py-2 mt-4 text-md font-semibold text-white rounded-xl shadow-md transition-all 
     ${
-      updatedUser.role === Roles.BRANCHADMIN
+      updatedUser.role !== Roles.ADMIN
         ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300"
         : "bg-red-600 hover:bg-red-700 focus:ring-red-300"
     }
   `}
             >
-              {updatedUser.role === Roles.BRANCHADMIN
+              {updatedUser.role !== Roles.ADMIN
                 ? "Promote to Admin"
-                : "Demote to User"}
+                : `Demote to ${currUser.role}`}
             </button>
 
             {/* Submit Button */}

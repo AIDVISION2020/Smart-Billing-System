@@ -319,52 +319,16 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
   }
 };
 
-export const getCategoriesByQuery = async (req, res) => {
-  try {
-    const { branchId, query } = req.body;
-
-    if (!branchId) return res.status(400).json({ error: "BranchId not found" });
-    if (!(await Branch.findOne({ where: { branchId } })))
-      return res.status(400).json({ error: "This branch does not exist" });
-
-    const branchCategory = defineCategoryModel(branchId);
-    const categories = await branchCategory.findAll({
-      where: {
-        [Op.or]: [
-          {
-            name: {
-              [Op.like]: `%${query}%`,
-            },
-          },
-          {
-            categoryId: {
-              [Op.like]: `%${query}%`,
-            },
-          },
-        ],
-      },
-    });
-
-    return res.status(200).json({ searchResults: categories });
-  } catch (err) {
-    console.log("Error getting categories by query: " + err.message);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
 export const getGoodsByQuery = async (req, res) => {
   try {
-    const { branchId, categoryId, query } = req.body;
+    const { branchId, query } = req.body;
     if (!branchId) return res.status(400).json({ error: "BranchId not found" });
     if (!(await Branch.findOne({ where: { branchId } })))
       return res.status(400).json({ error: "This branch does not exist" });
-    if (!categoryId)
-      return res.status(400).json({ error: "CategoryId not found" });
 
     const branchGood = defineGoodsModel(branchId);
     const goods = await branchGood.findAll({
       where: {
-        categoryId,
         [Op.or]: [
           {
             name: {

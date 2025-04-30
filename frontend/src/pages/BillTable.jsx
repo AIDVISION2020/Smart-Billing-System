@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   checkBillExists,
   openDatabase,
@@ -6,24 +6,26 @@ import {
 } from "../indexedDB/indexedDB";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar/Navbar";
-import { ReceiptPoundSterling } from "lucide-react";
 import toast from "react-hot-toast";
 import Spinner from "../components/spinner/Spinner";
-import AutomaticItemAddition from "../components/billItemsAddition/AutomaticItemAddition";
-import ManualItemAddition from "../components/billItemsAddition/ManualItemAddition";
 import Bill_Customer_Name from "../components/bill_customer_name/Bill_Customer_Name";
-import ItemAdditionDetails from "../components/billItemsAddition/ItemAdditionDetails";
 import CurrentBill from "../components/billCheckout/CurrentBill";
-import CurrGoodDetails from "../components/billItemsAddition/CurrGoodDetails";
+import useGetGoodsByQuery from "../hooks/useGetGoodsByQuery";
 
 const BillTable = () => {
+  const { getGoods } = useGetGoodsByQuery();
   const { billId } = useParams();
   const navigate = useNavigate();
+
   const [currentBill, setCurrentBill] = useState(null);
-  const [itemAdditionMode, setItemAdditionMode] = useState(null); // "manual" or "auto" or null
-  const [image, setImage] = useState(null);
   const [currGood, setCurrGood] = useState(null);
-  const [currCategory, setCurrCategory] = useState(null);
+  const [newProductId, setNewProductId] = useState("");
+  const [newProductQuantity, setNewProductQuantity] = useState(1);
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [productIdFocused, setProductIdFocused] = useState(false);
+
+  const productIdRef = useRef(null);
+  const quantityRef = useRef(null);
 
   useEffect(() => {
     const checkIfBillExists = async () => {
@@ -40,17 +42,37 @@ const BillTable = () => {
   }, [billId, navigate]);
 
   useEffect(() => {
-    setCurrCategory(null);
-    setCurrGood(null);
-    setImage(null);
-  }, [itemAdditionMode]);
+    if (productIdRef.current) productIdRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (currentBill && newProductId) {
+        try {
+          const results = await getGoods({
+            branchId: currentBill.branchId,
+            query: newProductId,
+          });
+          setFilteredResults(results);
+        } catch (error) {
+          console.error("Error fetching goods:", error);
+        }
+      } else {
+        setFilteredResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [newProductId, currentBill, getGoods]);
 
   const addItemToBill = async () => {
+    currGood.quantity = newProductQuantity;
     if (!currGood) return toast.error("No item selected to add to bill");
     if (currGood.quantity <= 0)
-      return toast.error("No item selected to add to bill");
+      return toast.error("Quantity must be greater than 0");
     if (currGood.quantity > currGood.maxQuantity)
-      return toast.error("Quantity should be less than max quantity");
+      return toast.error("Quantity exceeds max allowed");
+
     const bill = { ...currentBill };
     const itemIndex = bill.items.findIndex(
       (item) => item.itemId === currGood.itemId
@@ -70,6 +92,25 @@ const BillTable = () => {
     toast.success(`${currGood.name} added to bill`);
     setCurrentBill(bill);
     setCurrGood(null);
+    setNewProductId("");
+    setNewProductQuantity(1);
+    productIdRef.current.focus();
+  };
+
+  const handleProductIdKeyDown = (e) => {
+    if (e.key === "Enter" && filteredResults.length > 0) {
+      e.preventDefault();
+      const selected = filteredResults[0];
+      setCurrGood({
+        ...selected,
+        quantity: newProductQuantity,
+        maxQuantity: selected.quantity,
+      });
+      setTimeout(() => {
+        quantityRef.current?.focus();
+        quantityRef.current?.select();
+      }, 50);
+    }
   };
 
   return (
@@ -81,101 +122,108 @@ const BillTable = () => {
             currentBill={currentBill}
             setCurrentBill={setCurrentBill}
           />
-          <div className="flex-grow flex flex-wrap items-center justify-evenly space-y-4 px-4 py-2 bg-gray-100 dark:bg-gray-800">
-            {/* Left half - current product and it's quantity and metadata */}
-            <div className="max-w-sm w-full rounded-2xl shadow-md bg-white dark:bg-gray-800 p-4 space-y-4">
-              <div className="rounded-xl overflow-hidden w-full flex justify-center items-center p-2 border-dashed border-2 border-gray-300 dark:border-gray-600">
-                {image ? (
-                  <img
-                    src={image}
-                    alt="Product"
-                    className="block h-48 w-auto object-contain"
-                  />
-                ) : (
-                  <ReceiptPoundSterling
-                    size={100}
-                    className="text-gray-400 dark:text-gray-600"
-                  />
-                )}
-              </div>
 
-              {itemAdditionMode && (
-                <ItemAdditionDetails
-                  setItemAdditionMode={setItemAdditionMode}
-                  itemAdditionMode={itemAdditionMode}
-                />
-              )}
+          <div className="flex-grow flex flex-wrap flex-col items-center justify-center space-y-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 relative">
+            {/* Input Form */}
+            <div className="max-w-sm w-full rounded-2xl shadow-md bg-white dark:bg-gray-800 p-4 space-y-4 relative">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                Add Item to Bill
+              </h2>
+
+              <input
+                ref={productIdRef}
+                type="text"
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white"
+                placeholder="Enter Product ID"
+                value={newProductId}
+                onChange={(e) => setNewProductId(e.target.value)}
+                onFocus={() => setProductIdFocused(true)}
+                onBlur={() => setTimeout(() => setProductIdFocused(false), 200)}
+                onKeyDown={handleProductIdKeyDown}
+              />
+
+              {/* Dropdown List */}
+              {productIdFocused &&
+                (filteredResults.length > 0 ? (
+                  <ul className="absolute z-50 top-[110px] left-4 right-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md max-h-60 overflow-y-auto shadow-lg">
+                    {filteredResults.map((item) => (
+                      <div
+                        key={item.itemId}
+                        className="p-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setCurrGood({
+                            ...item,
+                            quantity: 1,
+                            maxQuantity: item.quantity,
+                            tax: (item.tax * item.price) / 100,
+                            taxRate: item.tax,
+                          });
+                          setNewProductId(item.name);
+                          setFilteredResults([]);
+                        }}
+                      >
+                        <div className="flex flex-col space-y-1">
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            {item.name}
+                          </span>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">
+                            ₹{item.price} | Stock: {item.quantity}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            ID: {item.itemId}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="absolute z-50 top-[90px] left-4 right-4 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-3">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      No results found, Try searching for a different product ID
+                    </span>
+                  </div>
+                ))}
+
+              <input
+                ref={quantityRef}
+                type="number"
+                step="0.01"
+                min={0}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white"
+                placeholder="Quantity / Weight"
+                value={newProductQuantity === 0 ? "" : newProductQuantity}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setNewProductQuantity(val === "" ? 0 : parseFloat(val));
+                }}
+              />
+
+              <button
+                className={`bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md p-2 w-full transition duration-200 ${
+                  !currGood ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={addItemToBill}
+                disabled={!currGood}
+              >
+                Add Product
+              </button>
+
               {currGood && (
-                <CurrGoodDetails
-                  currGood={currGood}
-                  image={image}
-                  setCurrGood={setCurrGood}
-                />
-              )}
-              {currGood ? (
-                <>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md p-2 w-full transition duration-200"
-                    onClick={() => {
-                      addItemToBill();
-                    }}
-                  >
-                    Add to bill
-                  </button>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md p-2 w-full transition duration-200"
-                    onClick={() => {
-                      setCurrGood(null);
-                    }}
-                  >
-                    Cancel Item
-                  </button>
-                </>
-              ) : itemAdditionMode === null ? (
                 <button
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md p-2 w-full transition duration-200"
-                  onClick={() => {
-                    setItemAdditionMode("auto");
-                  }}
+                  className="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-black dark:text-white font-semibold rounded-md p-2 w-full transition duration-200"
+                  onClick={() => setCurrGood(null)}
                 >
-                  Fetch New Item
-                </button>
-              ) : (
-                <button
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md p-2 w-full transition duration-200"
-                  onClick={() => {
-                    setItemAdditionMode(null);
-                  }}
-                >
-                  See Current Bill
+                  Cancel Item
                 </button>
               )}
             </div>
 
-            {/* Right half - current bill and total */}
-            <div className="max-w-4xl w-full rounded-2xl shadow-md dark:bg-gray-800 p-4 space-y-4 ">
-              {itemAdditionMode === "manual" ? (
-                <ManualItemAddition
-                  currCategory={currCategory}
-                  setCurrCategory={setCurrCategory}
-                  setCurrGood={setCurrGood}
-                  setImage={setImage}
-                  branchId={currentBill.branchId}
-                />
-              ) : itemAdditionMode === "auto" ? (
-                <AutomaticItemAddition
-                  currCategory={currCategory}
-                  setCurrCategory={setCurrCategory}
-                  setCurrGood={setCurrGood}
-                  setImage={setImage}
-                  branchId={currentBill.branchId}
-                />
-              ) : (
-                <CurrentBill
-                  currentBill={currentBill}
-                  setCurrentBill={setCurrentBill}
-                />
-              )}
+            {/* Current Bill Display */}
+            <div className=" w-full rounded-2xl shadow-md dark:bg-gray-800 p-4 space-y-4">
+              <CurrentBill
+                currentBill={currentBill}
+                setCurrentBill={setCurrentBill}
+              />
             </div>
           </div>
         </div>

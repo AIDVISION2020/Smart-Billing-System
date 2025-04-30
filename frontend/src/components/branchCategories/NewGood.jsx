@@ -1,5 +1,5 @@
 import propTypes from "prop-types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Check, Plus } from "lucide-react";
 
 const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
@@ -15,6 +15,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     name: "",
     description: "",
   });
+  const nameInputRef = useRef(null);
 
   const handleAddNewGood = () => {
     let newErrors = {};
@@ -46,6 +47,11 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
         tax: 0,
         category: selectedCategory.name,
       }));
+
+    // Focus the next item name input after state updates
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 0);
   };
 
   return (
@@ -109,6 +115,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
             <tr className="border-b dark:border-gray-700 bg-white dark:bg-gray-900">
               <td className="px-6 py-4">
                 <input
+                  ref={nameInputRef}
                   type="text"
                   placeholder="Item Name"
                   className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${

@@ -119,8 +119,8 @@ export const fetchUsersByBranchIdController = async (req, res) => {
     });
 
     if (!users || users.length === 0)
-      return res.status(404).json({
-        error: `No users found ${
+      return res.status(200).json({
+        message: `No users found ${
           branchIds.length > 0 && `for the branches - ${branchIds.join(", ")}`
         }`,
       });

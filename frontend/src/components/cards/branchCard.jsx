@@ -1,18 +1,12 @@
 import PropTypes from "prop-types";
 import { MapPin } from "lucide-react";
-import { useAuthContext } from "@/context/authContext";
-import BranchCardTools_Admin from "../adminComponents/branchCard_tools";
-import { Roles } from "../../constants/constants";
 
 const BranchCard = ({
   branchId,
   branchLocation,
-  setBranchListUpdCount,
   setSelectedBranch,
   selectedBranch,
 }) => {
-  const { authUser } = useAuthContext();
-
   const handleCardClick = () => {
     setSelectedBranch((prev) => {
       return prev === branchId ? null : branchId;
@@ -30,13 +24,6 @@ const BranchCard = ({
         } shadow-lg transition-all duration-300 hover:shadow-xl  hover:border-gray-500 dark:hover:border-gray-400 cursor-pointer`}
         onClick={selectedBranch ? handleCardClick : undefined}
       >
-        {authUser?.role === Roles.ADMIN && !selectedBranch && (
-          <BranchCardTools_Admin
-            branchId={branchId}
-            branchLocation={branchLocation}
-            setBranchListUpdCount={setBranchListUpdCount}
-          />
-        )}
         <div
           className={`${
             !selectedBranch && "px-12 py-8"
@@ -90,7 +77,6 @@ const BranchCard = ({
 BranchCard.propTypes = {
   branchId: PropTypes.string.isRequired,
   branchLocation: PropTypes.string.isRequired,
-  setBranchListUpdCount: PropTypes.func.isRequired,
   setSelectedBranch: PropTypes.func.isRequired,
   selectedBranch: PropTypes.string,
 };
