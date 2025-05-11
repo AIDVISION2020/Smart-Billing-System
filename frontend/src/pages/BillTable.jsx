@@ -47,7 +47,7 @@ const BillTable = () => {
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      if (currentBill && newProductId) {
+      if (currentBill) {
         try {
           const results = await getGoods({
             branchId: currentBill.branchId,
@@ -149,7 +149,7 @@ const BillTable = () => {
                     {filteredResults.map((item) => (
                       <div
                         key={item.itemId}
-                        className="p-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        className="flex justify-evenly space-x-3 p-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                         onClick={() => {
                           setCurrGood({
                             ...item,
@@ -173,6 +173,13 @@ const BillTable = () => {
                             ID: {item.itemId}
                           </span>
                         </div>
+                        {item.imageUrl && (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-12 h-12 rounded object-cover"
+                          />
+                        )}
                       </div>
                     ))}
                   </ul>
