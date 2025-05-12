@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 const useGetGoodsByQuery = () => {
   const [loading, setLoading] = useState(false);
 
-  const getGoods = useCallback(async ({ branchId, query }) => {
+  const getGoods = useCallback(async ({ branchId, query, catQuery }) => {
     setLoading(true);
 
     try {
@@ -15,6 +15,7 @@ const useGetGoodsByQuery = () => {
         body: JSON.stringify({
           branchId,
           query,
+          catQuery: catQuery,
         }),
       });
 

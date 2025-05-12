@@ -321,7 +321,7 @@ export const deleteCategoriesByCategoryIds = async (req, res) => {
 
 export const getGoodsByQuery = async (req, res) => {
   try {
-    const { branchId, query } = req.body;
+    const { branchId, query, catQuery } = req.body;
     if (!branchId) return res.status(400).json({ error: "BranchId not found" });
     if (!(await Branch.findOne({ where: { branchId } })))
       return res.status(400).json({ error: "This branch does not exist" });
@@ -329,17 +329,30 @@ export const getGoodsByQuery = async (req, res) => {
     const branchGood = defineGoodsModel(branchId);
     const goods = await branchGood.findAll({
       where: {
-        [Op.or]: [
+        [Op.and]: [
           {
-            name: {
-              [Op.like]: `%${query}%`,
-            },
+            [Op.or]: [
+              {
+                name: {
+                  [Op.like]: `%${query}%`,
+                },
+              },
+              {
+                itemId: {
+                  [Op.like]: `%${query}%`,
+                },
+              },
+            ],
           },
-          {
-            itemId: {
-              [Op.like]: `%${query}%`,
-            },
-          },
+          ...(catQuery
+            ? [
+                {
+                  categoryId: {
+                    [Op.like]: `%${catQuery}%`,
+                  },
+                },
+              ]
+            : []),
         ],
       },
     });
