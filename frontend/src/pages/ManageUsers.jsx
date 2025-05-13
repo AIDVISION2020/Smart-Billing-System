@@ -5,11 +5,15 @@ import AdminUsers from "../components/branchUsers/AdminUsers";
 import { useState, useEffect } from "react";
 import Spinner from "../components/spinner/Spinner";
 import { PagesLink } from "../constants/constants";
-import { Roles } from "../constants/constants";
+import { Roles, AppNameAcronym } from "../constants/constants";
 import { useAuthContext } from "../context/AuthContext";
 import NewBranchCard from "../components/cards/newBranchCard";
 
 const ManageUsers = () => {
+  useEffect(() => {
+    document.title = `${AppNameAcronym} | Manage Users`;
+  }, []);
+
   const { authUser } = useAuthContext();
   const userRole = authUser?.role;
   const { loading, getAccessibleBranches } = useGetAccessibleBranches();

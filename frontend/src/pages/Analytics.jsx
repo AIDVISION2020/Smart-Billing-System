@@ -1,6 +1,10 @@
 import Navbar from "../components/navbar/Navbar.jsx";
-import { PagesLink, AnalyticsTypes } from "../constants/constants.js";
-import { useState } from "react";
+import {
+  PagesLink,
+  AnalyticsTypes,
+  AppNameAcronym,
+} from "../constants/constants.js";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
 import SalesOverview from "../components/Analytics/Sales/SalesOverview.jsx";
@@ -8,6 +12,10 @@ import ItemsOverview from "../components/Analytics/Items/ItemsOverview.jsx";
 import StockInsights from "../components/Analytics/Stock/StockInsights.jsx";
 
 const Analytics = () => {
+  useEffect(() => {
+    document.title = `${AppNameAcronym} | Analytics`;
+  }, []);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAnalyticsType, setSelectedAnalyticsType] = useState(null);
 

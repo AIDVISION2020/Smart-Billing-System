@@ -1,5 +1,5 @@
 import Navbar from "../components/navbar/Navbar";
-import { PagesLink } from "../constants/constants.js";
+import { PagesLink, AppNameAcronym } from "../constants/constants.js";
 import {
   openDatabase,
   getUnfinishedBills,
@@ -15,6 +15,10 @@ import useGetAccessibleBranches from "../hooks/useGetAccessibleBranches.js";
 import { useAuthContext } from "../context/AuthContext.jsx";
 
 const Billing = () => {
+  useEffect(() => {
+    document.title = `${AppNameAcronym} | Billing`;
+  });
+
   const [allUnfinishedBills, setAllUnfinishedBills] = useState(null);
   const [updatedBillListCnt, setUpdatedBillListCnt] = useState(0);
   const [visibleCount, setVisibleCount] = useState(6);

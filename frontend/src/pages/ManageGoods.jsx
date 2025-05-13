@@ -1,10 +1,13 @@
 import AllBranches from "../components/allBranches/AllBranches.jsx";
 import SelectedBranch from "../components/selectedBranch/SelectedBranch.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/navbar/Navbar.jsx";
-import { PagesLink } from "../constants/constants.js";
+import { PagesLink, AppNameAcronym } from "../constants/constants.js";
 
 const ManageGoods = () => {
+  useEffect(() => {
+    document.title = `${AppNameAcronym} | Manage Goods`;
+  }, []);
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   return (

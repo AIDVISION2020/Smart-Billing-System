@@ -11,8 +11,13 @@ import Spinner from "../components/spinner/Spinner";
 import Bill_Customer_Name from "../components/bill_customer_name/Bill_Customer_Name";
 import CurrentBill from "../components/billCheckout/CurrentBill";
 import useGetGoodsByQuery from "../hooks/useGetGoodsByQuery";
+import { AppNameAcronym } from "../constants/constants";
 
 const BillTable = () => {
+  useEffect(() => {
+    document.title = `${AppNameAcronym} | Bill Table`;
+  });
+
   const { getGoods } = useGetGoodsByQuery();
   const { billId } = useParams();
   const navigate = useNavigate();
