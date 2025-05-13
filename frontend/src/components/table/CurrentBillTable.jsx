@@ -83,13 +83,18 @@ const CurrentBillTable = ({ currentBill, setCurrentBill }) => {
               ).toFixed(2)}
             </td>
             <td className="px-6 py-4 font-semibold text-red-600 dark:text-red-400 whitespace-nowrap">
-              {Number(good.taxRate).toFixed(2)}
+              {Number(good.taxRate).toFixed(2) / 2} +{" "}
+              {Number(good.taxRate).toFixed(2) / 2}
             </td>
             <td className="px-6 py-4 font-semibold text-red-600 dark:text-red-400 whitespace-nowrap">
               ₹
               {((Number(good.tax) || 0) * (Number(good.quantity) || 0)).toFixed(
                 2
-              )}
+              ) / 2}{" "}
+              + ₹
+              {((Number(good.tax) || 0) * (Number(good.quantity) || 0)).toFixed(
+                2
+              ) / 2}
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <button

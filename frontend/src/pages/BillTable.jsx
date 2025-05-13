@@ -140,6 +140,8 @@ const BillTable = () => {
     }
   };
 
+  console.log(currGood?.measurementType);
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <Navbar />
@@ -257,7 +259,7 @@ const BillTable = () => {
                   ref={quantityRef}
                   type="number"
                   step={currGood?.measurementType === "weight" ? "0.01" : "1"}
-                  min={0.01}
+                  min={currGood?.measurementType === "weight" ? "0.01" : "1"}
                   max={currGood?.maxQuantity}
                   className={`w-full p-2 border rounded focus:outline-none ${
                     !currGood && "hidden bg-gray-200"

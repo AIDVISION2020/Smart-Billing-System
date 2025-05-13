@@ -108,7 +108,8 @@ const BillCheckout = ({ currentBill, setCurrentBill }) => {
         <div className="flex justify-evenly items-center mt-4 space-x-2">
           <span className="text-gray-700 text-md font-semibold">Tax: </span>
           <span className="text-gray-700 text-md">
-            ₹{currentBill?.totalTax?.toFixed(2)}
+            ₹{currentBill?.totalTax?.toFixed(2) / 2} + ₹
+            {currentBill?.totalTax?.toFixed(2) / 2}
           </span>
         </div>
 
