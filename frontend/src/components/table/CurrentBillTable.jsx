@@ -38,7 +38,7 @@ const CurrentBillTable = ({ currentBill, setCurrentBill }) => {
           {[
             "Item ID",
             "Item Name",
-            "Quantity",
+            "Quantity / Weight(KG)",
             "Unit Price",
             "Total Price",
             "Tax Rate(%)",

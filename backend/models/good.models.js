@@ -47,6 +47,11 @@ const defineGoodsModel = (branchId) => {
         defaultValue:
           "https://cdn.pixabay.com/photo/2024/06/26/23/36/package-8856091_640.png",
       },
+      measurementType: {
+        type: DataTypes.ENUM("quantity", "weight"),
+        allowNull: false,
+        defaultValue: "quantity",
+      },
     },
     {
       tableName: tableName, // Set the dynamic table name

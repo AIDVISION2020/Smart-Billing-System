@@ -26,7 +26,7 @@ const BillTable = () => {
   const [currGood, setCurrGood] = useState(null);
   const [categoryId, setCategoryId] = useState("");
   const [newProductId, setNewProductId] = useState("");
-  const [newProductQuantity, setNewProductQuantity] = useState(1); // Changed default to 1 instead of 0
+  const [newProductQuantity, setNewProductQuantity] = useState(1); // Default to 1
   const [filteredResults, setFilteredResults] = useState([]);
   const [searchFieldsFocused, setSearchFieldsFocused] = useState(false);
 
@@ -256,18 +256,17 @@ const BillTable = () => {
                 <input
                   ref={quantityRef}
                   type="number"
-                  step="0.01"
+                  step={currGood?.measurementType === "weight" ? "0.01" : "1"}
                   min={0.01}
                   max={currGood?.maxQuantity}
-                  disabled={!currGood}
                   className={`w-full p-2 border rounded focus:outline-none ${
-                    !currGood && "bg-gray-200"
+                    !currGood && "hidden bg-gray-200"
                   } focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white`}
                   placeholder={`${
-                    currGood
-                      ? `Quantity (max ${currGood.maxQuantity}) / Weight`
-                      : "Select a product first"
-                  }`}
+                    currGood?.measurementType === "weight"
+                      ? "Enter weight in kg"
+                      : "Enter quantity"
+                  }, max:${currGood?.maxQuantity}`}
                   value={newProductQuantity === 0 ? "" : newProductQuantity}
                   onChange={(e) => {
                     const val = e.target.value;
