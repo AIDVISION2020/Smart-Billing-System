@@ -120,8 +120,12 @@ export const addNewGoods = async (req, res) => {
     let validGoods = [];
 
     for (const good of uniqueGoods) {
-      const { name, price, description, quantity, tax, category } = good;
-      const goodExists = await branchGood.findOne({ where: { name } });
+      const { name, price, description, quantity, tax, category, uuid } = good;
+      const goodExists = await branchGood.findOne({
+        where: {
+          [Op.or]: [{ itemId: uuid }, { name }],
+        },
+      });
       if (goodExists) continue;
 
       let categoryInstance = await branchCategory.findOne({
@@ -132,6 +136,7 @@ export const addNewGoods = async (req, res) => {
       }
 
       validGoods.push({
+        itemId: uuid,
         name,
         price,
         description,

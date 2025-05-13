@@ -4,6 +4,7 @@ import { Check, Plus } from "lucide-react";
 
 const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
   const [newGood, setNewGood] = useState({
+    uuid: "",
     name: "",
     description: "",
     price: 0,
@@ -15,10 +16,23 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     name: "",
     description: "",
   });
-  const nameInputRef = useRef(null);
+  const uuidInputRef = useRef(null);
 
   const handleAddNewGood = () => {
     let newErrors = {};
+    if (newGoods.some((good) => good.name === newGood.name)) {
+      newErrors.name = "Item name already exists!";
+    }
+    if (newGoods.some((good) => good.uuid === newGood.uuid)) {
+      newErrors.uuid = "Item with uuid already exists!";
+    }
+    if (!newGood.uuid.trim()) newErrors.uuid = "Item uuid is required!";
+    if (newGood.uuid.length < 3 || newGood.uuid.length > 6)
+      newErrors.uuid = "Item uuid must be between 3 and 6 characters!";
+    if (newGood.uuid.length > 0 && !/^[a-zA-Z0-9]+$/.test(newGood.uuid)) {
+      newErrors.uuid = "Item uuid must be alphanumeric!";
+    }
+
     if (!newGood.name.trim()) newErrors.name = "Item name is required!";
     if (!newGood.description.trim())
       newErrors.description = "Description cannot be empty!";
@@ -40,6 +54,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     setNewGoods([...newGoods, newGood]),
       setNewGood((prev) => ({
         ...prev,
+        uuid: "",
         name: "",
         description: "",
         price: 0,
@@ -50,7 +65,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
 
     // Focus the next item name input after state updates
     setTimeout(() => {
-      nameInputRef.current?.focus();
+      uuidInputRef.current?.focus();
     }, 0);
   };
 
@@ -72,17 +87,22 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
         <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300">
           <thead className="text-sm uppercase bg-gray-200 dark:bg-gray-900 dark:text-gray-400 font-bold">
             <tr>
-              {["Item Name", "Description", "Price", "Quantity", "Tax (%)"].map(
-                (header) => (
-                  <th
-                    key={header}
-                    scope="col"
-                    className="px-6 py-4 tracking-wide"
-                  >
-                    {header}
-                  </th>
-                )
-              )}
+              {[
+                "Item UUID",
+                "Item Name",
+                "Description",
+                "Price",
+                "Quantity",
+                "Tax (%)",
+              ].map((header) => (
+                <th
+                  key={header}
+                  scope="col"
+                  className="px-6 py-4 tracking-wide"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -95,6 +115,9 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                     : "bg-white dark:bg-gray-900"
                 } hover:bg-gray-200 dark:hover:bg-gray-700 transition-all`}
               >
+                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  {good.uuid}
+                </td>
                 <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                   {good.name}
                 </td>
@@ -115,7 +138,30 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
             <tr className="border-b dark:border-gray-700 bg-white dark:bg-gray-900">
               <td className="px-6 py-4">
                 <input
-                  ref={nameInputRef}
+                  ref={uuidInputRef}
+                  type="text"
+                  placeholder="Item Id"
+                  className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                    addGoodErrors.name
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-200 focus:ring-blue-400"
+                  }`}
+                  value={newGood.uuid}
+                  required={true}
+                  minLength={3}
+                  maxLength={6}
+                  onChange={(e) =>
+                    setNewGood({ ...newGood, uuid: e.target.value })
+                  }
+                />
+                {addGoodErrors.uuid && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.uuid}
+                  </p>
+                )}
+              </td>
+              <td className="px-6 py-4">
+                <input
                   type="text"
                   placeholder="Item Name"
                   className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
@@ -125,8 +171,8 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                   }`}
                   value={newGood.name}
                   required={true}
-                  min={3}
-                  max={50}
+                  minLength={3}
+                  maxLength={50}
                   onChange={(e) =>
                     setNewGood({ ...newGood, name: e.target.value })
                   }
@@ -142,8 +188,8 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                   type="text"
                   placeholder="Description"
                   required={true}
-                  min={3}
-                  max={50}
+                  minLength={3}
+                  maxLength={50}
                   className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
                     addGoodErrors.description
                       ? "border-red-500 focus:ring-red-400"
