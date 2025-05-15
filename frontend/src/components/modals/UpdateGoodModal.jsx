@@ -25,6 +25,7 @@ const UpdateGoodModal = ({
     quantity: currGood.quantity || 1,
     tax: currGood.tax || 0,
     itemId: currGood.itemId,
+    measurementType: currGood.measurementType || "quantity",
   });
   const { loading, modifyGood } = useModifyGood();
 
@@ -82,7 +83,13 @@ const UpdateGoodModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (
+      updatedGood.measurementType !== "quantity" &&
+      updatedGood.measurementType !== "weight"
+    ) {
+      toast.error("Measurement type must be either quantity or weight.");
+      return;
+    }
     for (const key in updatedGood) {
       if (typeof updatedGood[key] === "string") {
         updatedGood[key] = updatedGood[key].trim();
@@ -218,6 +225,66 @@ const UpdateGoodModal = ({
                 value={updatedGood.description}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Measurement Type Toggle */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
+                Measurement Type
+              </label>
+              <div className="flex items-center space-x-4">
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="measurementType"
+                    value="quantity"
+                    checked={updatedGood.measurementType === "quantity"}
+                    onChange={(e) =>
+                      setUpdatedGood((prev) => ({
+                        ...prev,
+                        measurementType: e.target.value,
+                      }))
+                    }
+                    className="sr-only peer"
+                  />
+                  <div
+                    className={`px-4 py-2 rounded-2xl border text-sm font-medium 
+        ${
+          updatedGood.measurementType === "quantity"
+            ? "bg-green-600 text-white border-green-600"
+            : "bg-gray-200 text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white"
+        }`}
+                  >
+                    Quantity
+                  </div>
+                </label>
+
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="measurementType"
+                    value="weight"
+                    checked={updatedGood.measurementType === "weight"}
+                    onChange={(e) =>
+                      setUpdatedGood((prev) => ({
+                        ...prev,
+                        measurementType: e.target.value,
+                      }))
+                    }
+                    className="sr-only peer"
+                  />
+                  <div
+                    className={`px-4 py-2 rounded-2xl border text-sm font-medium 
+        ${
+          updatedGood.measurementType === "weight"
+            ? "bg-blue-600 text-white border-blue-600"
+            : "bg-gray-200 text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white"
+        }`}
+                  >
+                    Weight
+                  </div>
+                </label>
+              </div>
             </div>
 
             {/* Modern Image Upload */}

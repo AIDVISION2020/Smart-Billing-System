@@ -69,6 +69,7 @@ const GoodsTable = ({
                 "Item ID",
                 "Item Name",
                 "Description",
+                "Measurement Type",
                 "Price",
                 "Quantity",
                 "Tax (%)",
@@ -101,6 +102,17 @@ const GoodsTable = ({
                   {good.name}
                 </td>
                 <td className="px-6 py-4 font-semibold">{good.description}</td>
+                <td className="px-6 py-4 font-semibold">
+                  <span
+                    className={`px-4 py-2 text-white ${
+                      good.measurementType === "weight"
+                        ? "bg-blue-600"
+                        : "bg-green-600"
+                    }`}
+                  >
+                    {good.measurementType}
+                  </span>
+                </td>
                 <td className="px-6 py-4 font-semibold text-green-600 dark:text-green-400">
                   ₹{good.price}
                 </td>

@@ -113,14 +113,29 @@ export const addNewGoods = async (req, res) => {
       acc[good.name] = (acc[good.name] || 0) + 1;
       return acc;
     }, {});
+    const uuidCounts = goods.reduce((acc, good) => {
+      acc[good.uuid] = (acc[good.uuid] || 0) + 1;
+      return acc;
+    }, {});
 
     // Step 2: Filter out goods that appear more than once
-    const uniqueGoods = goods.filter((good) => nameCounts[good.name] === 1);
+    let uniqueGoods = goods.filter(
+      (good) => nameCounts[good.name] === 1 && uuidCounts[good.uuid] === 1
+    );
 
     let validGoods = [];
 
     for (const good of uniqueGoods) {
-      const { name, price, description, quantity, tax, category, uuid } = good;
+      const {
+        name,
+        price,
+        description,
+        quantity,
+        tax,
+        category,
+        uuid,
+        measurementType,
+      } = good;
       const goodExists = await branchGood.findOne({
         where: {
           [Op.or]: [{ itemId: uuid }, { name }],
@@ -143,6 +158,7 @@ export const addNewGoods = async (req, res) => {
         quantity,
         tax,
         categoryId: categoryInstance.categoryId,
+        measurementType,
       });
     }
 

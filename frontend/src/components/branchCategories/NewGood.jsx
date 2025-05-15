@@ -11,6 +11,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     quantity: 0,
     tax: 0,
     category: selectedCategory.name,
+    measurementType: "quantity",
   });
   const [addGoodErrors, setAddGoodErrors] = useState({
     name: "",
@@ -33,6 +34,12 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
       newErrors.uuid = "Item uuid must be alphanumeric!";
     }
 
+    if (
+      newGood.measurementType !== "quantity" &&
+      newGood.measurementType !== "weight"
+    )
+      newErrors.measurementType =
+        "Measurement type must be either quantity or weight!";
     if (!newGood.name.trim()) newErrors.name = "Item name is required!";
     if (!newGood.description.trim())
       newErrors.description = "Description cannot be empty!";
@@ -91,8 +98,9 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                 "Item UUID",
                 "Item Name",
                 "Description",
+                "Measurement Type",
                 "Price",
-                "Quantity",
+                "Quantity / Weight(Kg)",
                 "Tax (%)",
               ].map((header) => (
                 <th
@@ -122,6 +130,17 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                   {good.name}
                 </td>
                 <td className="px-6 py-4 font-semibold">{good.description}</td>
+                <td className={`font-semibold text-white `}>
+                  <span
+                    className={`px-4 py-2 ${
+                      good.measurementType === "weight"
+                        ? "bg-blue-600"
+                        : "bg-green-600"
+                    }`}
+                  >
+                    {good.measurementType}
+                  </span>
+                </td>
                 <td className="px-6 py-4 font-semibold text-green-600 dark:text-green-400">
                   ₹{good.price}
                 </td>
@@ -206,7 +225,26 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                   </p>
                 )}
               </td>
-
+              <td className="px-6 py-4">
+                <select
+                  className="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 border-gray-200 focus:ring-blue-400"
+                  value={newGood.measurementType || "quantity"}
+                  onChange={(e) =>
+                    setNewGood({
+                      ...newGood,
+                      measurementType: e.target.value.toLowerCase(),
+                    })
+                  }
+                >
+                  <option value="quantity">Quantity</option>
+                  <option value="weight">Weight</option>
+                </select>
+                {addGoodErrors.measurementType && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {addGoodErrors.measurementType}
+                  </p>
+                )}
+              </td>
               <td className="px-6 py-4">
                 <input
                   type="number"

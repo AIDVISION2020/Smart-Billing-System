@@ -140,8 +140,6 @@ const BillTable = () => {
     }
   };
 
-  console.log(currGood?.measurementType);
-
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <Navbar />
