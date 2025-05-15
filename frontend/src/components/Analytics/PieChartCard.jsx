@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   PieChart,
   Pie,
@@ -10,27 +10,29 @@ import {
 import { ChevronDown } from "lucide-react";
 import propTypes from "prop-types";
 
-const COLORS = [
-  "#8884d8",
-  "#82ca9d",
-  "#ffc658",
-  "#ff8042",
-  "#8dd1e1",
-  "#d0ed57",
-  "#a4de6c",
-  "#ffc0cb",
-  "#ffb6c1",
-  "#ff69b4",
-  "#ff1493",
-  "#db7093",
-  "#c71585",
-];
-// Randomly rotate the colors array
-const shuffledColors = COLORS.sort(() => Math.random() - 0.5);
+// Generate N visually distinct colors using HSL
+function generateColors(count) {
+  const colors = [];
+  const saturation = 70;
+  const lightness = 60;
+  for (let i = 0; i < count; i++) {
+    const hue = Math.floor((360 * i) / count);
+    colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+  }
+  return colors;
+}
 
 export default function PieChatCard({ data, metricOptions, title, nameKey }) {
   const [selected, setSelected] = useState(metricOptions[0]);
   const [open, setOpen] = useState(false);
+
+  const filteredData = useMemo(() => {
+    return data.filter((item) => item[selected.value] > 0);
+  }, [data, selected.value]);
+  const colors = useMemo(
+    () => generateColors(filteredData.length),
+    [filteredData.length]
+  );
 
   // Check if all values for the selected metric are zero or null
   const hasData = data.some((val) => val[selected.value] > 0);
@@ -73,26 +75,29 @@ export default function PieChatCard({ data, metricOptions, title, nameKey }) {
 
       {/* Pie Chart or No Data Message */}
       {!hasData ? (
-        <div className="text-center text-gray-600">
+        <div className="h-full text-gray-600 flex items-center justify-center">
           <p>No data available for the selected metric.</p>
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={data}
+              data={filteredData}
               dataKey={selected.value}
               nameKey={nameKey}
               cx="50%"
               cy="50%"
               outerRadius={100}
-              label
+              label={({ name, value }) =>
+                `${name}: ${
+                  selected.isCurrency
+                    ? `₹${value.toFixed(2)}`
+                    : value.toFixed(2)
+                }`
+              }
             >
-              {data.map((_, i) => (
-                <Cell
-                  key={i}
-                  fill={shuffledColors[i % shuffledColors.length]}
-                />
+              {filteredData.map((_, i) => (
+                <Cell key={i} fill={colors[i % colors.length]} />
               ))}
             </Pie>
             <Tooltip

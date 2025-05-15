@@ -100,7 +100,7 @@ const SalesOverview = () => {
       const numberOfBills = billsSummary?.length || 0;
       const totalUnitsSold =
         itemsSummary?.reduce(
-          (sum, item) => sum + (item.purchasedQuantity || 0),
+          (sum, item) => sum + (Number(item.purchasedQuantity) || 0),
           0
         ) || 0;
 
@@ -108,7 +108,7 @@ const SalesOverview = () => {
       (itemsSummary || []).forEach((item) => {
         const key = item.itemId;
         const name = item.name || key;
-        const qty = item.purchasedQuantity || 0;
+        const qty = Number(item.purchasedQuantity) || 0;
         const price = parseFloat(item.priceWhenBought || 0);
         const tax = parseFloat(item.taxWhenBought || 0);
         const revenue = qty * price;

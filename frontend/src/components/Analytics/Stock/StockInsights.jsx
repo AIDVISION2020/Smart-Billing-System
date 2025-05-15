@@ -207,7 +207,8 @@ const StockInsights = () => {
                                 </p>
                               </div>
                               <span className="text-sm font-semibold text-red-600">
-                                {item.stock} left
+                                {item.stock}{" "}
+                                {item.measurementType === "weight" && "KG"} left
                               </span>
                             </li>
                           ))}

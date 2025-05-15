@@ -35,7 +35,7 @@ const defineGoodsModel = (branchId) => {
         allowNull: false,
       },
       quantity: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(20, 2),
         defaultValue: 0,
       },
       tax: {

@@ -61,7 +61,9 @@ const BillTable = () => {
             query: newProductId,
             catQuery: categoryId,
           });
-          setFilteredResults(results);
+          // If any good has quantity 0, remove it from the results
+          const filteredResults = results.filter((item) => item.quantity > 0);
+          setFilteredResults(filteredResults);
         } catch (error) {
           console.error("Error fetching goods:", error);
         }

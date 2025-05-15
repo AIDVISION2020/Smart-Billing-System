@@ -39,7 +39,7 @@ const defineBillItemModel = (branchId) => {
         allowNull: false,
       },
       purchasedQuantity: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(20, 2),
         allowNull: false,
       },
       taxWhenBought: {

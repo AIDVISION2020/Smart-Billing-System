@@ -342,83 +342,6 @@ const getCategorySummary = async (branchId, startDate, endDate, billItems) => {
 // BRANCH SUMMARY END
 
 // STOCK SUMMARY BEGIN
-// export const getStockSummary = async (req, res) => {
-//   try {
-//     const { branchId, startDate, endDate } = req.body;
-//     await checkValidBranch(branchId);
-//     checkValidDates(startDate, endDate);
-
-//     const start = new Date(startDate);
-//     const end = new Date(endDate);
-//     end.setHours(23, 59, 59, 999);
-
-//     const { BillItem } = initBillModels(branchId);
-//     const Goods = defineGoodsModel(branchId);
-
-//     const billItems = await BillItem.findAll({
-//       where: {
-//         createdAt: {
-//           [Op.between]: [start, end],
-//         },
-//       },
-//     });
-
-//     const itemIds = [...new Set(billItems.map((item) => item.itemId))];
-
-//     const goods = await Goods.findAll({
-//       where: {
-//         itemId: {
-//           [Op.in]: itemIds,
-//         },
-//       },
-//     });
-
-//     // Aggregate item-level stats
-//     const itemSalesMap = new Map();
-
-//     for (const item of billItems) {
-//       const { itemId, quantity, price, taxAmount } = item;
-
-//       if (!itemSalesMap.has(itemId)) {
-//         itemSalesMap.set(itemId, {
-//           itemId,
-//           totalItemsSold: 0,
-//           totalSales: 0,
-//           totalTax: 0,
-//         });
-//       }
-
-//       const current = itemSalesMap.get(itemId);
-
-//       current.totalItemsSold += Number(quantity);
-//       current.totalSales += Number(price);
-//       current.totalTax += Number(taxAmount);
-
-//       itemSalesMap.set(itemId, current);
-//     }
-
-//     const enrichedItems = goods.map((item) => {
-//       const stats = itemSalesMap.get(item.itemId) || {
-//         totalItemsSold: 0,
-//         totalSales: 0,
-//         totalTax: 0,
-//       };
-
-//       return {
-//         itemId: item.itemId,
-//         name: item.name,
-//         categoryId: item.categoryId,
-//         stock: Number(item.quantity), // typecast for safety
-//         ...stats,
-//       };
-//     });
-
-//     return res.json({ data: enrichedItems });
-//   } catch (error) {
-//     console.error("Error getting Stock summary:", error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
 
 // Label items based on stock thresholds
 const getItemLabel = (stock, lowThreshold = 10, overstockThreshold = 100) => {
@@ -442,6 +365,7 @@ const getItemDetails = (goods, categoryNameMap) => {
       stock,
       unitPrice: Number(g.price || 0),
       label,
+      measurementType: g.measurementType,
     };
   });
 };

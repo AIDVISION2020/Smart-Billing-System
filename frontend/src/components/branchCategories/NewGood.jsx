@@ -11,7 +11,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     quantity: 0,
     tax: 0,
     category: selectedCategory.name,
-    measurementType: "quantity",
+    measurementType: "",
   });
   const [addGoodErrors, setAddGoodErrors] = useState({
     name: "",
@@ -43,10 +43,17 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
     if (!newGood.name.trim()) newErrors.name = "Item name is required!";
     if (!newGood.description.trim())
       newErrors.description = "Description cannot be empty!";
-    if (newGood.quantity < 1)
-      newErrors.quantity = "Quantity cannot be less than 1!";
-    if (!Number.isInteger(Number(newGood.quantity)))
-      newErrors.quantity = "Quantity must be an integer!";
+
+    const quantityNum = Number(newGood.quantity);
+    if (newGood.measurementType === "quantity") {
+      if (!Number.isInteger(quantityNum)) {
+        newErrors.quantity = "Quantity must be an integer for this item!";
+      }
+    } else if (newGood.measurementType === "weight") {
+      if (isNaN(quantityNum) || quantityNum < 0) {
+        newErrors.quantity = "Please enter a valid weight!";
+      }
+    }
 
     if (newGood.price < 0) newErrors.price = "Price cannot be less than 0!";
     if (newGood.tax < 0 || newGood.tax > 100)
@@ -68,12 +75,42 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
         quantity: 0,
         tax: 0,
         category: selectedCategory.name,
+        measurementType: "",
       }));
 
     // Focus the next item name input after state updates
     setTimeout(() => {
       uuidInputRef.current?.focus();
     }, 0);
+  };
+
+  const isAddGoodValid = () => {
+    const uuidValid =
+      newGood.uuid.trim().length >= 3 &&
+      newGood.uuid.trim().length <= 6 &&
+      /^[a-zA-Z0-9]+$/.test(newGood.uuid);
+    const nameValid = newGood.name.trim().length > 0;
+    const descValid = newGood.description.trim().length > 0;
+    const priceValid = newGood.price >= 0;
+    const taxValid = newGood.tax >= 0 && newGood.tax <= 100;
+    const measureValid =
+      newGood.measurementType === "quantity" ||
+      newGood.measurementType === "weight";
+    const quantityNum = Number(newGood.quantity);
+    const quantityValid =
+      newGood.measurementType === "quantity"
+        ? Number.isInteger(quantityNum)
+        : !isNaN(quantityNum) && quantityNum >= 0;
+
+    return (
+      uuidValid &&
+      nameValid &&
+      descValid &&
+      priceValid &&
+      taxValid &&
+      measureValid &&
+      quantityValid
+    );
   };
 
   return (
@@ -228,7 +265,7 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
               <td className="px-6 py-4">
                 <select
                   className="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 border-gray-200 focus:ring-blue-400"
-                  value={newGood.measurementType || "quantity"}
+                  value={newGood.measurementType}
                   onChange={(e) =>
                     setNewGood({
                       ...newGood,
@@ -236,9 +273,13 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                     })
                   }
                 >
+                  <option value="" disabled>
+                    Select
+                  </option>
                   <option value="quantity">Quantity</option>
                   <option value="weight">Weight</option>
                 </select>
+
                 {addGoodErrors.measurementType && (
                   <p className="text-red-500 text-xs mt-1">
                     {addGoodErrors.measurementType}
@@ -270,14 +311,19 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
                 <input
                   type="number"
                   placeholder="Quantity"
-                  min={1}
-                  max={999999999}
+                  disabled={!newGood.measurementType}
+                  min={newGood.measurementType === "weight" ? 0.1 : 1}
+                  step={newGood.measurementType === "weight" ? 0.1 : 1}
+                  max={10000000}
                   required={true}
                   className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 ${
                     addGoodErrors.quantity
                       ? "border-red-500 focus:ring-red-400"
                       : "border-gray-200 focus:ring-blue-400"
-                  }`}
+                  } ${
+                    !newGood.measurementType && "cursor-not-allowed bg-gray-300"
+                  }
+                  `}
                   value={newGood.quantity}
                   onChange={(e) =>
                     setNewGood({ ...newGood, quantity: e.target.value })
@@ -313,18 +359,13 @@ const NewGood = ({ newGoods, setNewGoods, selectedCategory }) => {
               </td>
               <td>
                 <button
+                  disabled={!isAddGoodValid()}
                   className={`px-4 py-2 rounded-lg transition-all ${
-                    newGood.name.trim() &&
-                    newGood.description.trim() &&
-                    newGood.quantity > 0 &&
-                    newGood.price > 0 &&
-                    newGood.tax >= 0 &&
-                    newGood.tax <= 100 &&
-                    Number.isInteger(Number(newGood.quantity))
+                    isAddGoodValid()
                       ? "bg-green-500 text-white hover:bg-green-600"
                       : "bg-gray-400 text-gray-700 cursor-not-allowed"
                   }`}
-                  onClick={() => handleAddNewGood()}
+                  onClick={handleAddNewGood}
                 >
                   <Check size={17} strokeWidth={2.5} />
                 </button>

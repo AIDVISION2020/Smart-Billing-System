@@ -388,7 +388,8 @@ const UpdateGoodModal = ({
                 id="quantity"
                 className="w-full px-4 py-2 mt-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 required
-                min={1}
+                min={currGood.measurementType === "weight" ? 0.1 : 1}
+                step={currGood.measurementType === "weight" ? 0.1 : 1}
                 max={999999999}
                 value={updatedGood.quantity}
                 onChange={handleChange}
